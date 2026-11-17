@@ -1369,9 +1369,7 @@
         const lines = batchRadarItems.map((it, i) =>
             `#${i + 1} ${it.ticker} | ${it.quant.gradeShort} | Skor: ${it.score} | Net: ${formatBillion(it.netCash)} | VWAP Bandar: Rp ${it.quant.bandarVwap} | TP1: Rp ${it.quant.targetTp1} | CL: Rp ${it.quant.hardCutLoss} | Order: ${it.quant.lots} Lot`
         );
-        navigator.clipboard.writeText("--- WHALEX-RAY V37.0 BATCH BSJP RADAR ---
-" + lines.join("
-")).then(() => {
+        navigator.clipboard.writeText("--- WHALEX-RAY V37.1 BATCH BSJP RADAR ---\n" + lines.join("\n")).then(() => {
             alert("✅ Peringkat Batch BSJP berhasil disalin ke Clipboard!");
         });
     }
@@ -1789,6 +1787,18 @@
         try {
             const params = new URLSearchParams(window.location.search);
             const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+            const batchDataRaw = params.get("batchdata") || hashParams.get("batchdata");
+            if (batchDataRaw) {
+                try {
+                    const parsedBatch = JSON.parse(batchDataRaw);
+                    if (Array.isArray(parsedBatch) && parsedBatch.length > 0) {
+                        setTimeout(() => ingestBatchPayload(parsedBatch), 150);
+                        return;
+                    }
+                } catch (errBatch) {
+                    console.error("Batch hash parse error:", errBatch);
+                }
+            }
             const ticker = params.get("ticker") || hashParams.get("ticker");
             const buy = params.get("buy") || hashParams.get("buy");
             const sell = params.get("sell") || hashParams.get("sell");
