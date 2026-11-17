@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhaleX-Ray V36.1 Online: Unlimited Live IDX, Auto-Market Context, OCR & Cloud Journal</title>
+    <title>WhaleX-Ray V37.0 Pro Quant: Bandar Mark-Up Calculator, Asymmetric RDN Sizer & Batch Tab Sniper</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -39,7 +39,7 @@
         .textarea-box.buy textarea { border-color: rgba(16, 185, 129, 0.5); }
         .textarea-box.sell textarea { border-color: rgba(239, 68, 68, 0.5); }
         textarea:focus { outline: none; border-style: solid; }
-        .settings-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 1rem; background-color: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); }
+        .settings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem; background-color: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); }
         @media (max-width: 1100px) { .settings-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 650px) { .settings-grid { grid-template-columns: repeat(2, 1fr); } }
         .input-group { display: flex; flex-direction: column; position: relative; }
@@ -174,14 +174,40 @@
         .webhook-row { display: flex; gap: 0.5rem; margin-top: 0.6rem; flex-wrap: wrap; }
         .webhook-row input { flex: 1; min-width: 220px; background: var(--card-bg); color: #fff; border: 1px solid var(--border); padding: 0.55rem 0.8rem; border-radius: 6px; font-size: 0.8rem; }
 
+
+        /* V37.0 Pro Quant & Batch Sniper Styles */
+        .quant-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1rem; margin-bottom: 1.5rem; }
+        @media (max-width: 950px) { .quant-grid { grid-template-columns: 1fr; } }
+        .quant-card { background: #0f172a; border-radius: 10px; padding: 1.2rem; border: 1px solid var(--border); }
+        .quant-card.pain-card { border-color: rgba(56, 189, 248, 0.5); }
+        .quant-card.sizer-card { border-color: rgba(16, 185, 129, 0.5); }
+        .quant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; gap: 0.5rem; flex-wrap: wrap; }
+        .quant-title { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--info); }
+        .sizer-card .quant-title { color: var(--success); }
+        .zone-pill { font-size: 0.72rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; }
+        .levels-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-top: 0.8rem; }
+        @media (max-width: 650px) { .levels-grid { grid-template-columns: repeat(2, 1fr); } }
+        .level-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; padding: 0.65rem 0.5rem; text-align: center; }
+        .level-lbl { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 3px; }
+        .level-val { font-size: 0.95rem; font-weight: 800; font-family: monospace; color: var(--text-main); }
+        .level-sub { font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 2px; }
+        .sizer-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-top: 0.8rem; }
+        .grade-banner { padding: 0.6rem 0.8rem; border-radius: 7px; font-weight: 800; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+        .batch-radar-card { background: var(--card-bg); border: 1px solid var(--info); border-radius: 12px; padding: 1.3rem; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.45); display: none; }
+        .batch-table th { background: #0f172a; font-size: 0.68rem; padding: 0.7rem 0.5rem; }
+        .batch-table td { padding: 0.7rem 0.5rem; font-size: 0.82rem; vertical-align: middle; }
+        .btn-mini { padding: 4px 8px; border-radius: 5px; border: 1px solid var(--info); background: var(--info-bg); color: var(--info); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+        .btn-mini:hover { background: var(--info); color: #0f172a; }
+        .tv-embed-box { display: none; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #0f172a; }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>WhaleX-Ray V36.1 <span style="font-size:0.5em; background:var(--success); color:#0f172a; padding:3px 8px; border-radius:6px; vertical-align:middle;">ONLINE UNLIMITED</span></h1>
-        <p class="subtitle">Live Market Volume & Turnover Context • Auto-Refresh • Screenshot OCR • Direct Cloud Journal</p>
+        <h1>WhaleX-Ray V37.0 <span style="font-size:0.5em; background:linear-gradient(90deg, #10b981, #38bdf8); color:#0f172a; padding:3px 10px; border-radius:6px; vertical-align:middle; font-weight:900;">PRO QUANT + BATCH SNIPER</span></h1>
+        <p class="subtitle">Bandar Pain & Mark-Up Calculator (IDX Tick Valid) • Asymmetric RDN Position Sizer • Multi-Tab BSJP Radar</p>
     </div>
     <div class="card">
         
@@ -252,9 +278,46 @@
                 <input type="number" id="whaleThreshold" value="50000000" min="1000000" step="1000000">
                 <span class="help-text" id="hakaHint">10x Batas Ritel (Auto)</span>
             </div>
+            <div class="input-group">
+                <label for="rdnCapital" style="color: var(--success);">💰 Modal RDN Anda (Rp)</label>
+                <input type="number" id="rdnCapital" value="10000000" min="100000" step="500000" oninput="onRdnCapitalChange()">
+                <span class="help-text" id="rdnHint">Rp 10,00 Juta (Auto-simpan)</span>
+            </div>
         </div>
         <button id="scanBtn" class="btn-scan" onclick="scanData()" type="button">🔍 Eksekusi Analisis Institusi</button>
     </div>
+
+    <div class="batch-radar-card" id="batchRadarCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.8rem;">
+            <div>
+                <h2 style="margin:0; font-size:1.15rem; color:var(--info);">🔥 BATCH BSJP RADAR — PAPAN PERINGKAT BANDAR</h2>
+                <span style="font-size:0.78rem; color:var(--text-muted);" id="batchRadarSummary">Diurutkan otomatis berdasarkan Grade Setup, Skor Bandar, & Net Cash Institusi</span>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button type="button" class="pill-btn" onclick="copyBatchSummary()">📋 Copy Ranking BSJP</button>
+                <button type="button" class="pill-btn" style="color:var(--danger);" onclick="clearBatchRadar()">🗑️ Tutup / Bersihkan</button>
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="batch-table" style="margin-top:0;">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Emiten & Harga</th>
+                        <th>Grade & Zona Bandar</th>
+                        <th>Skor / HHI</th>
+                        <th>Net Cash</th>
+                        <th>VWAP Bandar (Float)</th>
+                        <th>TP1 (+8%) / Cut Loss</th>
+                        <th>Alokasi RDN</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="batchRadarBody"></tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="card result-container" id="resultCard">
         <div class="result-header-banner">
             <div>
@@ -262,10 +325,15 @@
                 <span class="result-ticker-badge" id="bannerTicker">EMITEN: -</span>
                 <span class="result-company-sub" id="bannerCompany">-</span>
             </div>
-            <div style="text-align:right;">
+            <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
                 <span class="result-price-badge" id="bannerMeta">Harga: Rp 0 | Periode: 1 Hari</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="pill-btn" onclick="toggleEmbeddedTvChart()">📊 Chart Live</button>
+                    <button type="button" class="pill-btn active" onclick="addCurrentToBatchRadar()">➕ Masukkan ke Radar BSJP</button>
+                </div>
             </div>
         </div>
+        <div class="tv-embed-box" id="tvEmbedBox"></div>
         <div class="strategy-box" id="strategyBox">
             <div class="strategy-title" id="strategyTitle">Mode Mesin: -</div>
             <div class="strategy-desc" id="strategyDesc">-</div>
@@ -281,7 +349,73 @@
         </div>
 
         
-        <label>Konteks Pasar Live & Rasio Serapan Bandar (Online Data)</label>
+
+        <div class="quant-grid">
+            <div class="quant-card pain-card">
+                <div class="quant-header">
+                    <span class="quant-title">🎯 Bandar Pain & Mark-Up Calculator (IDX Tick Valid)</span>
+                    <span class="zone-pill" id="bandarZonePill" style="background:var(--info-bg); color:var(--info);">MENGHITUNG...</span>
+                </div>
+                <div style="font-size:0.84rem; color:var(--text-main); line-height:1.45;" id="bandarPainNarrative">
+                    Menghitung rata-rata harga modal tertimbang (VWAP) dari broker pengendali utama...
+                </div>
+                <div class="levels-grid">
+                    <div class="level-box">
+                        <span class="level-lbl">VWAP Modal Bandar</span>
+                        <span class="level-val" id="lvlBandarVwap" style="color:var(--info);">Rp 0</span>
+                        <span class="level-sub" id="lvlFloatingSub">Floating: 0.0%</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Area Entry Ideal</span>
+                        <span class="level-val" id="lvlIdealEntry" style="color:var(--success);">Rp 0</span>
+                        <span class="level-sub">Rapat modal bandar</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Target Mark-Up (+8% / +15%)</span>
+                        <span class="level-val" id="lvlTargetMarkup" style="color:var(--warning);">Rp 0</span>
+                        <span class="level-sub" id="lvlTargetSub">TP2: Rp 0</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Hard Cut Loss (-3 Tick)</span>
+                        <span class="level-val" id="lvlHardCl" style="color:var(--danger);">Rp 0</span>
+                        <span class="level-sub" id="lvlClRiskSub">Risiko: 0.0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quant-card sizer-card">
+                <div class="quant-header">
+                    <span class="quant-title">⚖️ Asymmetric RDN Position Sizer</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;" id="sizerRdnLabel">RDN: Rp 10,00 Juta</span>
+                </div>
+                <div class="grade-banner" id="setupGradeBanner" style="background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning);">
+                    <span id="setupGradeTitle">GRADE C — CASH IS KING</span>
+                    <span id="setupAllocPct">0% RDN</span>
+                </div>
+                <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.4;" id="sizerRationale">
+                    Alokasi modal otomatis menyesuaikan kekuatan skor institusi dan jarak harga dari modal bandar.
+                </div>
+                <div class="sizer-metrics">
+                    <div class="level-box">
+                        <span class="level-lbl">Alokasi Rupiah</span>
+                        <span class="level-val" id="sizerAllocRp" style="color:var(--success);">Rp 0</span>
+                        <span class="level-sub">Modal posisi ini</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Jumlah Order (Lot)</span>
+                        <span class="level-val" id="sizerLots" style="color:var(--info);">0 Lot</span>
+                        <span class="level-sub" id="sizerLotPriceSub">@ Rp 0</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Maks. Risiko Cut Loss</span>
+                        <span class="level-val" id="sizerMaxLoss" style="color:var(--danger);">Rp 0</span>
+                        <span class="level-sub" id="sizerRdnRiskPct">0.00% dari RDN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <label>Konteks Pasar Live & Rasio Serapan Bandar (Online Data)</label>
         <div class="market-context-grid" id="marketContextGrid">
             <div class="mc-item"><div class="mc-val" id="mcDayRange">-</div><div class="mc-lbl">Rentang Harga Hari Ini (Low - High)</div></div>
             <div class="mc-item"><div class="mc-val" id="mcMarketVol">-</div><div class="mc-lbl">Total Volume Pasar (Lot)</div></div>
@@ -763,6 +897,498 @@
         });
         return parsedData;
     }
+
+    // === V37.0 IDX TICK RULES, BANDAR PAIN CALCULATOR & ASYMMETRIC POSITION SIZER ===
+    let batchRadarItems = [];
+
+    function getIdxTick(price) {
+        if (price < 200) return 1;
+        if (price < 500) return 2;
+        if (price < 2000) return 5;
+        if (price < 5000) return 10;
+        return 25;
+    }
+
+    function roundToIdxTick(rawPrice) {
+        if (!rawPrice || rawPrice <= 0) return 1;
+        const p = Math.round(rawPrice);
+        const tick = getIdxTick(p);
+        return Math.max(1, Math.round(p / tick) * tick);
+    }
+
+    function onRdnCapitalChange() {
+        const val = parseFloat(document.getElementById("rdnCapital").value) || 0;
+        localStorage.setItem("whalexray_rdn_capital", String(val));
+        const hintEl = document.getElementById("rdnHint");
+        if (hintEl) hintEl.textContent = formatBillion(val) + " (Auto-simpan)";
+        if (document.getElementById("resultCard").style.display === "block") {
+            scanData();
+        }
+    }
+
+    function loadSavedRdnCapital() {
+        const saved = localStorage.getItem("whalexray_rdn_capital");
+        const input = document.getElementById("rdnCapital");
+        if (saved && input) {
+            input.value = saved;
+        }
+        const val = parseFloat(input?.value) || 10000000;
+        const hintEl = document.getElementById("rdnHint");
+        if (hintEl) hintEl.textContent = formatBillion(val) + " (Auto-simpan)";
+    }
+
+    function computeQuantPlan(params) {
+        const { results, currentPrice, institutionalScore, hhiBuy, isAbsorption, isStealth, crossingWarning, rdnCapital } = params;
+
+        // 1. Identify Top Controlling Buyers for Bandar VWAP
+        const netBuyers = results.filter(r => r.isBuyer && r.netLot > 0);
+        const whaleBuyers = netBuyers.filter(r => r.brokerData.isWhale);
+        const controllers = (whaleBuyers.length > 0 ? whaleBuyers : netBuyers).slice(0, 3);
+
+        let weightedValSum = 0;
+        let weightedLotSum = 0;
+        controllers.forEach(c => {
+            const p = c.brokerAvgPrice > 0 ? c.brokerAvgPrice : (c.netLot > 0 ? Math.abs(c.exactNetCash) / (c.netLot * 100) : currentPrice);
+            if (p > 0 && c.netLot > 0) {
+                weightedValSum += p * c.netLot;
+                weightedLotSum += c.netLot;
+            }
+        });
+
+        const rawVwap = weightedLotSum > 0 ? (weightedValSum / weightedLotSum) : currentPrice;
+        const bandarVwap = roundToIdxTick(rawVwap > 0 ? rawVwap : currentPrice);
+        const refPrice = currentPrice > 0 ? currentPrice : bandarVwap;
+        const floatingPct = bandarVwap > 0 ? ((refPrice - bandarVwap) / bandarVwap) * 100 : 0;
+
+        // 2. Classify Bandar Pain Zone
+        let zoneLabel = "NETRAL / BELUM TERDETEKSI";
+        let zoneColor = "var(--text-muted)";
+        let zoneBg = "rgba(148, 163, 184, 0.15)";
+        let painNarrative = "Belum ada dominasi broker pengendali yang cukup kuat untuk menghitung titik impas bandar.";
+
+        if (weightedLotSum > 0 && bandarVwap > 0) {
+            if (floatingPct <= -1.5) {
+                zoneLabel = "🟢 ZONA BANDAR TERJEPIT (" + floatingPct.toFixed(1) + "%)";
+                zoneColor = "var(--success)";
+                zoneBg = "var(--success-bg)";
+                painNarrative = "Harga saat ini berada " + Math.abs(floatingPct).toFixed(1) + "% DI BAWAH rata-rata modal pengendali (" + controllers.map(c => c.broker).join(", ") + " @ Rp " + bandarVwap.toLocaleString("id-ID") + "). Bandar sedang menahan benteng support / averaging.";
+            } else if (floatingPct <= 3.5) {
+                zoneLabel = "🚀 SWEET SPOT: BANDAR BARU MASUK (+" + Math.max(0, floatingPct).toFixed(1) + "%)";
+                zoneColor = "var(--success)";
+                zoneBg = "var(--success-bg)";
+                painNarrative = "Harga sangat rapat dengan modal pengendali (" + controllers.map(c => c.broker).join(", ") + " @ Rp " + bandarVwap.toLocaleString("id-ID") + "). Bandar belum punya ruang profit untuk distribusi — probabilitas mark-up +8% s.d. +15% sangat tinggi.";
+            } else if (floatingPct <= 12.0) {
+                zoneLabel = "🟡 FASE MARK-UP BERJALAN (+" + floatingPct.toFixed(1) + "%)";
+                zoneColor = "var(--warning)";
+                zoneBg = "var(--warning-bg)";
+                painNarrative = "Pengendali sudah mengantongi floating profit +" + floatingPct.toFixed(1) + "% di atas modal VWAP (Rp " + bandarVwap.toLocaleString("id-ID") + "). Masih layak kawal selama HHI kuat, namun disiplin pasang trailing stop.";
+            } else {
+                zoneLabel = "🔴 ZONA RAWAN GUYUR (+" + floatingPct.toFixed(1) + "%)";
+                zoneColor = "var(--danger)";
+                zoneBg = "var(--danger-bg)";
+                painNarrative = "PERINGATAN EXIT LIQUIDITY: Pengendali sudah untung +" + floatingPct.toFixed(1) + "% dari modal (Rp " + bandarVwap.toLocaleString("id-ID") + "). Sangat rawan HAKI / guyuran ke ritel yang FOMO di pucuk.";
+            }
+        }
+
+        // 3. Calculate Valid IDX Tick Levels
+        const tick = getIdxTick(bandarVwap);
+        const idealEntryLow = roundToIdxTick(bandarVwap - tick);
+        const idealEntryHigh = roundToIdxTick(bandarVwap + (2 * tick));
+        const targetTp1 = roundToIdxTick(bandarVwap * 1.08);
+        const targetTp2 = roundToIdxTick(bandarVwap * 1.15);
+        const hardCutLoss = Math.max(1, bandarVwap - (3 * getIdxTick(bandarVwap)));
+
+        const entryBasis = refPrice > 0 ? refPrice : bandarVwap;
+        const clRiskPct = entryBasis > 0 ? Math.max(0, ((entryBasis - hardCutLoss) / entryBasis) * 100) : 0;
+
+        // 4. Asymmetric RDN Position Sizer
+        let grade = "GRADE C — CASH IS KING";
+        let gradeShort = "GRADE C";
+        let allocPct = 0;
+        let gradeColor = "var(--text-muted)";
+        let gradeBg = "rgba(148, 163, 184, 0.12)";
+        let rationale = "Sinyal netral, distribusi, atau harga sudah lari terlalu jauh di atas modal bandar. Simpan cash untuk peluang Grade A.";
+
+        if (floatingPct > 12.0 || institutionalScore <= -2) {
+            grade = "GRADE C / TRAP — SKIP (0%)";
+            gradeShort = "SKIP";
+            allocPct = 0;
+            gradeColor = "var(--danger)";
+            gradeBg = "var(--danger-bg)";
+            rationale = floatingPct > 12.0
+                ? "Harga sudah lari +" + floatingPct.toFixed(1) + "% di atas modal bandar. Risiko diguyur jauh lebih besar daripada potensi naik."
+                : "Terdeteksi distribusi / tekanan jual institusi. Dilarang entry melawan arus uang besar.";
+        } else if ((institutionalScore >= 5 || isAbsorption || isStealth) && floatingPct <= 4.0 && !crossingWarning) {
+            grade = "GRADE A+ — ASYMMETRIC CONVICTION";
+            gradeShort = "GRADE A+";
+            allocPct = 35;
+            gradeColor = "var(--success)";
+            gradeBg = "var(--success-bg)";
+            rationale = "Setup terbaik: Akumulasi institusi ekstrem + harga masih di zona modal bandar (risiko cut loss ketat, potensi mark-up lebar).";
+        } else if (institutionalScore >= 4 && floatingPct <= 8.5 && !crossingWarning) {
+            grade = "GRADE A — HIGH CONVICTION";
+            gradeShort = "GRADE A";
+            allocPct = 25;
+            gradeColor = "var(--info)";
+            gradeBg = "var(--info-bg)";
+            rationale = "Dominasi beli institusi terkonfirmasi dan jarak dari VWAP bandar masih terkendali.";
+        } else if (institutionalScore >= 2 && floatingPct <= 12.0) {
+            grade = "GRADE B — TESTING POSITION";
+            gradeShort = "GRADE B";
+            allocPct = 12;
+            gradeColor = "var(--warning)";
+            gradeBg = "var(--warning-bg)";
+            rationale = crossingWarning
+                ? "Terdeteksi crossing/estafet antar bandar. Masuk porsi kecil dulu sambil menunggu konfirmasi arah sopir baru."
+                : "Akumulasi awal terdeteksi. Gunakan porsi testing (12% RDN) dan tambah posisi hanya jika breakout dengan volume.";
+        }
+
+        const allocRupiah = Math.round(rdnCapital * (allocPct / 100));
+        const lots = entryBasis > 0 ? Math.floor(allocRupiah / (entryBasis * 100)) : 0;
+        const actualDeployedRp = lots * entryBasis * 100;
+        const maxLossRp = lots > 0 && entryBasis > hardCutLoss ? Math.round(lots * 100 * (entryBasis - hardCutLoss)) : 0;
+        const rdnRiskPct = rdnCapital > 0 ? (maxLossRp / rdnCapital) * 100 : 0;
+
+        return {
+            bandarVwap,
+            floatingPct,
+            zoneLabel,
+            zoneColor,
+            zoneBg,
+            painNarrative,
+            idealEntryLow,
+            idealEntryHigh,
+            targetTp1,
+            targetTp2,
+            hardCutLoss,
+            clRiskPct,
+            grade,
+            gradeShort,
+            allocPct,
+            gradeColor,
+            gradeBg,
+            rationale,
+            allocRupiah,
+            lots,
+            actualDeployedRp,
+            maxLossRp,
+            rdnRiskPct,
+            controllers: controllers.map(c => c.broker).join(", ") || "-"
+        };
+    }
+
+    function renderQuantCards(q, rdnCapital) {
+        const zonePill = document.getElementById("bandarZonePill");
+        zonePill.textContent = q.zoneLabel;
+        zonePill.style.color = q.zoneColor;
+        zonePill.style.backgroundColor = q.zoneBg;
+
+        document.getElementById("bandarPainNarrative").textContent = q.painNarrative;
+        document.getElementById("lvlBandarVwap").textContent = formatRupiah(q.bandarVwap);
+        document.getElementById("lvlFloatingSub").textContent = "Floating: " + (q.floatingPct >= 0 ? "+" : "") + q.floatingPct.toFixed(1) + "% (" + q.controllers + ")";
+        document.getElementById("lvlIdealEntry").textContent = "Rp " + q.idealEntryLow.toLocaleString("id-ID") + " - " + q.idealEntryHigh.toLocaleString("id-ID");
+        document.getElementById("lvlTargetMarkup").textContent = formatRupiah(q.targetTp1);
+        document.getElementById("lvlTargetSub").textContent = "TP2 (+15%): " + formatRupiah(q.targetTp2);
+        document.getElementById("lvlHardCl").textContent = formatRupiah(q.hardCutLoss);
+        document.getElementById("lvlClRiskSub").textContent = "Jarak CL: -" + q.clRiskPct.toFixed(1) + "%";
+
+        document.getElementById("sizerRdnLabel").textContent = "RDN: " + formatBillion(rdnCapital);
+        const banner = document.getElementById("setupGradeBanner");
+        banner.style.color = q.gradeColor;
+        banner.style.backgroundColor = q.gradeBg;
+        banner.style.borderColor = q.gradeColor;
+        document.getElementById("setupGradeTitle").textContent = q.grade;
+        document.getElementById("setupAllocPct").textContent = q.allocPct + "% RDN";
+        document.getElementById("sizerRationale").textContent = q.rationale;
+        document.getElementById("sizerAllocRp").textContent = formatBillion(q.allocRupiah);
+        document.getElementById("sizerLots").textContent = q.lots.toLocaleString("id-ID") + " Lot";
+        document.getElementById("sizerLotPriceSub").textContent = q.lots > 0 ? ("Nilai: " + formatBillion(q.actualDeployedRp)) : "Tidak ada order";
+        document.getElementById("sizerMaxLoss").textContent = formatRupiah(q.maxLossRp);
+        document.getElementById("sizerRdnRiskPct").textContent = q.rdnRiskPct.toFixed(2) + "% dari total RDN";
+    }
+
+    function toggleEmbeddedTvChart() {
+        const box = document.getElementById("tvEmbedBox");
+        if (!box) return;
+        if (box.style.display === "block") {
+            box.style.display = "none";
+            box.innerHTML = "";
+            return;
+        }
+        const ticker = document.getElementById("stockTicker").value.trim().toUpperCase() || "IHSG";
+        const tvSym = ticker === "IHSG" ? "IDX:COMPOSITE" : "IDX:" + ticker;
+        box.style.display = "block";
+        box.innerHTML = '<iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_chart&symbol=' + encodeURIComponent(tvSym) + '&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=0f172a&studies=MASimple%40tv-basicstudies&theme=dark&style=1&timezone=Asia%2FJakarta&withdateranges=1&showpopupbutton=1&locale=id" style="width:100%; height:420px; border:0;"></iframe>';
+    }
+
+    // === BATCH BSJP RADAR FUNCTIONS ===
+    function analyzeStockSnapshot(item) {
+        const ticker = (item.ticker || "IDX").toUpperCase();
+        const companyName = idxStocks[ticker] || "Bursa Efek Indonesia";
+        const buyText = item.buyText || "";
+        const sellText = item.sellText || "";
+        const tradeDays = parseInt(item.days || document.getElementById("tradeDays").value) || 1;
+        const priceChange = parseFloat(item.chg || 0) || 0;
+        const rdnCapital = parseFloat(document.getElementById("rdnCapital").value) || 10000000;
+
+        const buyData = processTextarea(buyText);
+        const sellData = processTextarea(sellText);
+
+        let estPrice = parseFloat(item.price) || 0;
+        if (estPrice <= 0) {
+            let prices = [];
+            Object.values(buyData).forEach(x => { if (x.avgTradePrice > 0) prices.push(x.avgTradePrice); });
+            Object.values(sellData).forEach(x => { if (x.avgTradePrice > 0) prices.push(x.avgTradePrice); });
+            if (prices.length > 0) estPrice = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+        }
+
+        // Dynamic thresholds based on price
+        let baseRitel = 1500000;
+        if (estPrice >= 10000) baseRitel = 20000000;
+        else if (estPrice >= 5000) baseRitel = 15000000;
+        else if (estPrice >= 2000) baseRitel = 10000000;
+        else if (estPrice >= 1000) baseRitel = 7500000;
+        else if (estPrice >= 500) baseRitel = 5000000;
+        else if (estPrice > 100) baseRitel = 2500000;
+        const thresholdValue = Math.round(baseRitel * (tradeDays > 5 ? 0.6 : (tradeDays > 1 ? 0.8 : 1)));
+        const whaleThreshold = thresholdValue * 10;
+
+        const allBrokers = new Set([...Object.keys(buyData), ...Object.keys(sellData)]);
+        let netCashSum = 0;
+        let institutionalScore = 0;
+        let totalBuyLot = 0;
+        let buyLotsArray = [];
+        let results = [];
+
+        allBrokers.forEach(broker => {
+            const b = buyData[broker] || { val: 0, lot: 0, freq: 0, avgTradePrice: 0 };
+            const s = sellData[broker] || { val: 0, lot: 0, freq: 0, avgTradePrice: 0 };
+            const netLot = b.lot - s.lot;
+            const exactNetCash = b.val - s.val;
+            if (netLot === 0) return;
+            if (netLot > 0) {
+                totalBuyLot += netLot;
+                buyLotsArray.push({ lot: netLot, broker });
+            }
+            netCashSum += exactNetCash;
+
+            const isBuyer = netLot > 0;
+            const avgValue = isBuyer ? (b.freq > 0 ? b.val / b.freq : 0) : (s.freq > 0 ? s.val / s.freq : 0);
+            const brokerAvgPrice = isBuyer ? b.avgTradePrice : s.avgTradePrice;
+            const brokerData = getBrokerInfo(broker);
+            const isFakeRetail = (brokerData.isRetail && avgValue > thresholdValue);
+            if (isFakeRetail) brokerData.isWhale = true;
+
+            if (brokerData.isRetail && !isFakeRetail) {
+                institutionalScore += isBuyer ? -1 : 1;
+            } else {
+                let score = 2;
+                if (avgValue > whaleThreshold) score = 4;
+                else if (avgValue > thresholdValue) score = 3;
+                institutionalScore += isBuyer ? score : -score;
+            }
+            results.push({ broker, brokerData, netLot, exactNetCash, avgValue, isBuyer, brokerAvgPrice });
+        });
+
+        let hhiBuy = 0;
+        if (totalBuyLot > 0) {
+            hhiBuy = buyLotsArray.reduce((sum, it) => sum + Math.pow((it.lot / totalBuyLot) * 100, 2), 0);
+        }
+        if (tradeDays > 1) {
+            if (hhiBuy >= 2500) institutionalScore += 4;
+            else if (hhiBuy >= 1500) institutionalScore += 2;
+        }
+
+        results.sort((a, b) => b.netLot - a.netLot);
+        const topBuyer = results.find(r => r.isBuyer);
+        const topSeller = results.slice().reverse().find(r => !r.isBuyer);
+
+        let crossingWarning = false;
+        let isAbsorption = false;
+        let isStealth = false;
+        if (topBuyer && topSeller && topBuyer.brokerData.isWhale && topSeller.brokerData.isWhale) {
+            const ratio = Math.abs(topBuyer.netLot) / Math.abs(topSeller.netLot);
+            if (ratio >= 0.8 && ratio <= 1.25 && Math.abs(topBuyer.netLot) > (totalBuyLot * 0.15)) crossingWarning = true;
+        }
+        if (topBuyer && topSeller && !topSeller.brokerData.isWhale && topBuyer.brokerData.isWhale) {
+            if (priceChange <= 0 && topBuyer.netLot >= (totalBuyLot * 0.2)) isAbsorption = true;
+        }
+        if (!isAbsorption && topBuyer && topBuyer.brokerData.isWhale && institutionalScore >= 4 && priceChange <= 1) {
+            if (tradeDays > 1 && hhiBuy > 1500) isStealth = true;
+        }
+
+        const quant = computeQuantPlan({
+            results,
+            currentPrice: estPrice,
+            institutionalScore,
+            hhiBuy,
+            isAbsorption,
+            isStealth,
+            crossingWarning,
+            rdnCapital
+        });
+
+        return {
+            ticker,
+            companyName,
+            price: estPrice,
+            chg: priceChange,
+            days: tradeDays,
+            buyText,
+            sellText,
+            score: institutionalScore,
+            hhi: Math.round(hhiBuy),
+            netCash: netCashSum,
+            quant
+        };
+    }
+
+    function gradePriority(gradeShort) {
+        if (gradeShort === "GRADE A+") return 4;
+        if (gradeShort === "GRADE A") return 3;
+        if (gradeShort === "GRADE B") return 2;
+        return 1;
+    }
+
+    function renderBatchRadar() {
+        const card = document.getElementById("batchRadarCard");
+        const tbody = document.getElementById("batchRadarBody");
+        if (!card || !tbody) return;
+
+        if (batchRadarItems.length === 0) {
+            card.style.display = "none";
+            return;
+        }
+
+        batchRadarItems.sort((a, b) => {
+            const gp = gradePriority(b.quant.gradeShort) - gradePriority(a.quant.gradeShort);
+            if (gp !== 0) return gp;
+            if (b.score !== a.score) return b.score - a.score;
+            return b.netCash - a.netCash;
+        });
+
+        card.style.display = "block";
+        document.getElementById("batchRadarSummary").textContent =
+            "Menampilkan " + batchRadarItems.length + " emiten tersaring • Diurutkan otomatis berdasarkan Grade Setup, Skor Bandar, & Net Cash";
+
+        tbody.innerHTML = batchRadarItems.map((it, idx) => {
+            const q = it.quant;
+            return `
+                <tr>
+                    <td style="font-weight:900; color:${idx === 0 ? 'var(--warning)' : 'var(--text-muted)'}; font-size:1rem;">#${idx + 1}</td>
+                    <td>
+                        <strong style="color:var(--info); font-size:1rem;">${it.ticker}</strong><br>
+                        <span style="font-family:monospace; font-size:0.78rem;">Rp ${it.price.toLocaleString("id-ID")} (${it.chg >= 0 ? "+" : ""}${it.chg.toFixed(2)}%)</span>
+                    </td>
+                    <td>
+                        <span class="badge" style="background:${q.gradeBg}; color:${q.gradeColor}; border:1px solid ${q.gradeColor};">${q.gradeShort}</span><br>
+                        <span style="font-size:0.7rem; color:${q.zoneColor};">${q.zoneLabel}</span>
+                    </td>
+                    <td style="font-family:monospace;">
+                        <strong style="color:${it.score >= 4 ? 'var(--success)' : (it.score < 0 ? 'var(--danger)' : 'var(--warning)')};">${it.score > 0 ? "+" + it.score : it.score}</strong><br>
+                        <span style="font-size:0.72rem; color:var(--text-muted);">HHI: ${it.hhi.toLocaleString("id-ID")}</span>
+                    </td>
+                    <td style="font-weight:bold; color:${it.netCash >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                        ${it.netCash >= 0 ? "+" : ""}${formatBillion(it.netCash)}
+                    </td>
+                    <td style="font-family:monospace;">
+                        Rp ${q.bandarVwap.toLocaleString("id-ID")}<br>
+                        <span style="font-size:0.72rem; color:${q.floatingPct <= 3.5 ? 'var(--success)' : 'var(--warning)'};">(${q.floatingPct >= 0 ? "+" : ""}${q.floatingPct.toFixed(1)}%)</span>
+                    </td>
+                    <td style="font-family:monospace; font-size:0.76rem;">
+                        <span style="color:var(--warning);">TP1: Rp ${q.targetTp1.toLocaleString("id-ID")}</span><br>
+                        <span style="color:var(--danger);">CL: Rp ${q.hardCutLoss.toLocaleString("id-ID")}</span>
+                    </td>
+                    <td style="font-family:monospace;">
+                        <strong style="color:var(--success);">${q.allocPct}% (${q.lots.toLocaleString("id-ID")} Lot)</strong><br>
+                        <span style="font-size:0.7rem; color:var(--text-muted);">${formatBillion(q.allocRupiah)}</span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-mini" onclick="inspectBatchItem('${it.ticker}')">🔍 Bedah</button>
+                        <button type="button" class="btn-mini" style="border-color:var(--danger); color:var(--danger); background:transparent; margin-left:3px;" onclick="removeBatchItem('${it.ticker}')">✕</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    function upsertBatchItem(snapshot) {
+        const idx = batchRadarItems.findIndex(x => x.ticker === snapshot.ticker);
+        if (idx >= 0) batchRadarItems[idx] = snapshot;
+        else batchRadarItems.push(snapshot);
+    }
+
+    function addCurrentToBatchRadar() {
+        const ticker = document.getElementById("stockTicker").value.trim().toUpperCase() || "IDX";
+        const buyText = document.getElementById("buyInput").value.trim();
+        const sellText = document.getElementById("sellInput").value.trim();
+        if (!buyText && !sellText) {
+            alert("Data Broker Summary masih kosong.");
+            return;
+        }
+        const snap = analyzeStockSnapshot({
+            ticker,
+            price: parseFloat(document.getElementById("avgPrice").value) || 0,
+            chg: parseFloat(document.getElementById("priceChange").value) || 0,
+            days: parseInt(document.getElementById("tradeDays").value) || 1,
+            buyText,
+            sellText
+        });
+        upsertBatchItem(snap);
+        renderBatchRadar();
+        document.getElementById("batchRadarCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function inspectBatchItem(ticker) {
+        const item = batchRadarItems.find(x => x.ticker === ticker);
+        if (!item) return;
+        document.getElementById("stockTicker").value = item.ticker;
+        onTickerInput();
+        if (item.price > 0) document.getElementById("avgPrice").value = item.price;
+        document.getElementById("priceChange").value = item.chg;
+        document.getElementById("tradeDays").value = item.days;
+        document.getElementById("buyInput").value = item.buyText;
+        document.getElementById("sellInput").value = item.sellText;
+        autoUpdateThreshold();
+        scanData();
+        document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function removeBatchItem(ticker) {
+        batchRadarItems = batchRadarItems.filter(x => x.ticker !== ticker);
+        renderBatchRadar();
+    }
+
+    function clearBatchRadar() {
+        batchRadarItems = [];
+        renderBatchRadar();
+    }
+
+    function copyBatchSummary() {
+        if (batchRadarItems.length === 0) return;
+        const lines = batchRadarItems.map((it, i) =>
+            `#${i + 1} ${it.ticker} | ${it.quant.gradeShort} | Skor: ${it.score} | Net: ${formatBillion(it.netCash)} | VWAP Bandar: Rp ${it.quant.bandarVwap} | TP1: Rp ${it.quant.targetTp1} | CL: Rp ${it.quant.hardCutLoss} | Order: ${it.quant.lots} Lot`
+        );
+        navigator.clipboard.writeText("--- WHALEX-RAY V37.0 BATCH BSJP RADAR ---
+" + lines.join("
+")).then(() => {
+            alert("✅ Peringkat Batch BSJP berhasil disalin ke Clipboard!");
+        });
+    }
+
+    function ingestBatchPayload(payloadList) {
+        if (!Array.isArray(payloadList) || payloadList.length === 0) return;
+        payloadList.forEach(raw => {
+            const snap = analyzeStockSnapshot(raw);
+            upsertBatchItem(snap);
+        });
+        renderBatchRadar();
+        // Automatically load the #1 top-ranked stock into the detailed analyzer below
+        if (batchRadarItems.length > 0) {
+            inspectBatchItem(batchRadarItems[0].ticker);
+        }
+    }
+
     function scanData() {
         try {
             const tickerInput = document.getElementById("stockTicker").value.trim().toUpperCase();
@@ -1067,6 +1693,19 @@
             const avgPace = Math.round(Math.abs(netVolSum) / tradeDays);
             document.getElementById("statPace").textContent = avgPace.toLocaleString("id-ID") + " Lot/Hari";
             
+            const rdnCapital = parseFloat(document.getElementById("rdnCapital")?.value) || 10000000;
+            const quantPlan = computeQuantPlan({
+                results,
+                currentPrice,
+                institutionalScore,
+                hhiBuy,
+                isAbsorption,
+                isStealth,
+                crossingWarning,
+                rdnCapital
+            });
+            renderQuantCards(quantPlan, rdnCapital);
+
             document.getElementById("resultCard").style.display = "block";
             
             
@@ -1125,6 +1764,10 @@
     
     // === CHROME EXTENSION & URL BRIDGE ===
     window.addEventListener("message", function(event) {
+        if (event.data && event.data.type === "WHALEXRAY_BATCH_PAYLOAD") {
+            ingestBatchPayload(event.data.payload);
+            return;
+        }
         if (event.data && event.data.type === "WHALEXRAY_BROKSUM_PAYLOAD") {
             const p = event.data.payload;
             if (p.ticker) {
@@ -1345,7 +1988,25 @@
         }
     }
 
-    window.onload = function() { autoUpdateThreshold(); checkUrlBridge(); renderJournalHistory(); };
+    window.onload = function() {
+        loadSavedRdnCapital();
+        autoUpdateThreshold();
+        checkUrlBridge();
+        renderJournalHistory();
+        // Poll briefly for injected batch payload from Chrome Extension
+        let batchChecks = 0;
+        const batchPoll = setInterval(() => {
+            batchChecks++;
+            if (Array.isArray(window.__WHALEXRAY_BATCH__) && window.__WHALEXRAY_BATCH__.length > 0) {
+                const data = window.__WHALEXRAY_BATCH__;
+                window.__WHALEXRAY_BATCH__ = null;
+                clearInterval(batchPoll);
+                ingestBatchPayload(data);
+            } else if (batchChecks >= 25) {
+                clearInterval(batchPoll);
+            }
+        }, 200);
+    };
 </script>
 </body>
 </html>
