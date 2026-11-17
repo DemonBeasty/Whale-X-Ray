@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhaleX-Ray V36.0 Online: Unlimited Live IDX, Auto-Market Context, OCR & Cloud Journal</title>
+    <title>WhaleX-Ray V36.1 Online: Unlimited Live IDX, Auto-Market Context, OCR & Cloud Journal</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -180,7 +180,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>WhaleX-Ray V36.0 <span style="font-size:0.5em; background:var(--success); color:#0f172a; padding:3px 8px; border-radius:6px; vertical-align:middle;">ONLINE UNLIMITED</span></h1>
+        <h1>WhaleX-Ray V36.1 <span style="font-size:0.5em; background:var(--success); color:#0f172a; padding:3px 8px; border-radius:6px; vertical-align:middle;">ONLINE UNLIMITED</span></h1>
         <p class="subtitle">Live Market Volume & Turnover Context • Auto-Refresh • Screenshot OCR • Direct Cloud Journal</p>
     </div>
     <div class="card">
@@ -556,7 +556,7 @@
     }
 
     async function tryYahooJson(url, sourceLabel, ticker) {
-        const res = await fetchWithTimeout(url, 5500);
+        const res = await fetchWithTimeout(url, 6000);
         if (!res.ok) throw new Error("HTTP " + res.status);
         const text = await res.text();
         let data = JSON.parse(text);
@@ -577,15 +577,38 @@
         throw new Error("Invalid Yahoo payload");
     }
 
+    async function tryGoogleFinance(proxyUrl, sourceLabel, ticker) {
+        const res = await fetchWithTimeout(proxyUrl, 6500);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        let htmlText = await res.text();
+        if (htmlText.startsWith("{")) {
+            try {
+                const wrapped = JSON.parse(htmlText);
+                if (wrapped.contents) htmlText = wrapped.contents;
+            } catch (e) {}
+        }
+        // Google Finance embeds data-last-price="XXXX" and data-previous-close="XXXX"
+        const priceMatch = htmlText.match(/data-last-price="([0-9.,]+)"/i);
+        const prevMatch = htmlText.match(/data-previous-close="([0-9.,]+)"/i);
+        if (priceMatch && priceMatch[1]) {
+            const livePrice = parseFloat(priceMatch[1].replace(/,/g, ""));
+            const prevClose = prevMatch && prevMatch[1] ? parseFloat(prevMatch[1].replace(/,/g, "")) : livePrice;
+            if (!isNaN(livePrice) && livePrice > 0) {
+                applyFetchedPrice(ticker, livePrice, prevClose, sourceLabel);
+                return true;
+            }
+        }
+        throw new Error("Google Finance price tag not found");
+    }
+
     async function tryStooqCsv(url, sourceLabel, ticker) {
-        const res = await fetchWithTimeout(url, 5500);
+        const res = await fetchWithTimeout(url, 6000);
         if (!res.ok) throw new Error("HTTP " + res.status);
         let text = await res.text();
         if (text.startsWith("{")) {
             const wrapped = JSON.parse(text);
             if (wrapped.contents) text = wrapped.contents;
         }
-        // Stooq format: Symbol,Date,Time,Open,High,Low,Close,Volume
         const lines = text.trim().split(/\r?\n/);
         if (lines.length >= 2) {
             const cols = lines[1].split(",");
@@ -616,27 +639,28 @@
         statusEl.textContent = "⏳ Menarik harga live " + ticker + "...";
         statusEl.className = "live-status status-fetching";
         
+        const gfUrl = "https://www.google.com/finance/quote/" + ticker + ":IDX";
         const y1 = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker + ".JK?interval=1d&range=2d";
         const y2 = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker + ".JK?interval=1d&range=2d";
         const stooqUrl = "https://stooq.com/q/l/?s=" + ticker.toLowerCase() + ".jk&f=sd2t2ohlcv&h&e=csv";
 
         const attempts = [
-            () => tryYahooJson("https://corsproxy.io/?" + encodeURIComponent(y1), "Live IDX", ticker),
-            () => tryYahooJson("https://api.allorigins.win/get?url=" + encodeURIComponent(y2), "Live IDX", ticker),
+            () => tryGoogleFinance("https://api.allorigins.win/raw?url=" + encodeURIComponent(gfUrl), "Google Finance", ticker),
+            () => tryGoogleFinance("https://corsproxy.io/?" + encodeURIComponent(gfUrl), "Google Finance", ticker),
+            () => tryGoogleFinance("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(gfUrl), "Google Finance", ticker),
+            () => tryYahooJson("https://api.allorigins.win/raw?url=" + encodeURIComponent(y1), "Live IDX", ticker),
+            () => tryYahooJson("https://corsproxy.io/?" + encodeURIComponent(y2), "Live IDX", ticker),
             () => tryYahooJson("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(y1), "Live IDX", ticker),
-            () => tryStooqCsv("https://corsproxy.io/?" + encodeURIComponent(stooqUrl), "Market Feed", ticker),
             () => tryStooqCsv("https://api.allorigins.win/raw?url=" + encodeURIComponent(stooqUrl), "Market Feed", ticker)
         ];
 
         try {
-            // Run all proxy routes concurrently and take the fastest successful response
             await Promise.any(attempts.map(fn => fn()));
             return;
         } catch (aggErr) {
             console.warn("Semua jalur live price gagal/diblokir:", aggErr);
         }
         
-        // Fallback 1: Hitung dari kolom B.Avg / S.Avg yang di-paste
         const estPrice = estimatePriceFromPastedData();
         if (estPrice > 0) {
             priceInput.value = estPrice;
@@ -1128,9 +1152,16 @@
             const days = params.get("days") || hashParams.get("days");
             const auto = params.get("auto") || hashParams.get("auto");
 
+            const extPrice = params.get("price") || hashParams.get("price");
+            const extChg = params.get("chg") || hashParams.get("chg");
             if (ticker) {
                 document.getElementById("stockTicker").value = ticker.toUpperCase();
                 onTickerInput();
+            }
+            if (extPrice && parseFloat(extPrice) > 0) {
+                const pVal = Math.round(parseFloat(extPrice));
+                const cVal = extChg ? parseFloat(extChg) : 0;
+                applyFetchedPrice(ticker ? ticker.toUpperCase() : "IDX", pVal, cVal !== 0 ? (pVal / (1 + cVal/100)) : pVal, "Stockbit Live");
             }
             if (days) document.getElementById("tradeDays").value = days;
             if (buy) document.getElementById("buyInput").value = decodeURIComponent(buy);
