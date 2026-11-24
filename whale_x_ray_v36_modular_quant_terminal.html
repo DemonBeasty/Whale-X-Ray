@@ -1,0 +1,2578 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whale X-Ray V36 — Modular Quant Terminal (IDX / IHSG)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tesseract.js CDN for Client-Side OCR Screenshot Extraction -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: '#060a12',
+            surface: '#0f172a',
+            elevated: '#131c31',
+            edge: '#1e293b',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Core Institutional Quant Terminal Theme */
+    body {
+      background-color: #060a12;
+      color: #f1f5f9;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Subtle Quantitative Grid & Ambient Glow */
+    .quant-grid-bg {
+      background-image:
+        radial-gradient(circle at 14% 0%, rgba(6, 182, 212, 0.08), transparent 38%),
+        radial-gradient(circle at 86% 6%, rgba(16, 185, 129, 0.06), transparent 36%),
+        linear-gradient(to right, rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+    }
+
+    /* Custom Dark Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #060a12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Smooth Tab Transition */
+    .tab-panel {
+      animation: fadeSlideIn 0.18s ease-out;
+    }
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen quant-grid-bg flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- ==================== STICKY HEADER & 5-TAB MODULAR NAVIGATION ==================== -->
+  <header class="sticky top-0 z-40 bg-[#060a12]/95 backdrop-blur-md border-b border-[#1e293b]">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 space-y-3">
+      <!-- Top Row: Brand Identity & Live Jakarta (WIB) IDX Session Pill -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 via-emerald-500/15 to-[#0f172a] border border-cyan-500/40 flex items-center justify-center shadow-lg shadow-cyan-950/40">
+            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-extrabold tracking-tight text-white text-base sm:text-lg">WHALE X-RAY</span>
+              <span class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/35">V36.0 MODULAR EDITION</span>
+            </div>
+            <p class="text-[11px] text-slate-400">IDX / IHSG Institutional Bandarmology & Quantitative Risk Terminal</p>
+          </div>
+        </div>
+
+        <!-- Live Jakarta (WIB) Market Session Pill -->
+        <div id="wib-session-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0f172a] border border-[#1e293b] text-xs font-mono">
+          <span id="wib-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="wib-clock" class="text-slate-200 font-semibold tabular-nums">--:--:-- WIB</span>
+          <span class="text-slate-600">|</span>
+          <span id="wib-session-label" class="text-emerald-400 font-semibold">IDX SESSION</span>
+        </div>
+      </div>
+
+      <!-- Bottom Row: 5-Tab Modular Navigation Bar -->
+      <nav aria-label="Modul Navigasi Utama" class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+        <button type="button" onclick="switchMainTab('radar')" id="nav-tab-radar"
+          class="shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-cyan-500/15 text-cyan-300 border border-cyan-500/45 shadow-sm">
+          <span>🎯</span>
+          <span>Radar Utama (V36 Core)</span>
+        </button>
+
+        <button type="button" onclick="switchMainTab('pain')" id="nav-tab-pain"
+          class="shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-[#0f172a] text-slate-400 border border-[#1e293b] hover:text-slate-200 hover:border-slate-700">
+          <span>🧮</span>
+          <span>Bandar Pain & Mark-Up</span>
+        </button>
+
+        <button type="button" onclick="switchMainTab('sizer')" id="nav-tab-sizer"
+          class="shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-[#0f172a] text-slate-400 border border-[#1e293b] hover:text-slate-200 hover:border-slate-700">
+          <span>⚖️</span>
+          <span>RDN Position Sizer</span>
+        </button>
+
+        <button type="button" onclick="switchMainTab('batch')" id="nav-tab-batch"
+          class="shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-[#0f172a] text-slate-400 border border-[#1e293b] hover:text-slate-200 hover:border-slate-700">
+          <span>📡</span>
+          <span>Batch BSJP Radar</span>
+        </button>
+
+        <button type="button" onclick="switchMainTab('bep')" id="nav-tab-bep"
+          class="shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-[#0f172a] text-slate-400 border border-[#1e293b] hover:text-slate-200 hover:border-slate-700">
+          <span>📊</span>
+          <span>Average & BEP</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== NON-BLOCKING TOAST NOTIFICATION STACK ==================== -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-5">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: 🎯 RADAR UTAMA (V36 CORE) — DEFAULT LANDING VIEW                   -->
+    <!-- ========================================================================= -->
+    <section id="panel-radar" class="tab-panel space-y-5">
+
+      <!-- 1. ONLINE TOOLBAR -->
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 shadow-xl">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+          <!-- Ticker Input -->
+          <div class="lg:col-span-2">
+            <label for="v36-ticker" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              Ticker Saham
+            </label>
+            <div class="relative">
+              <input id="v36-ticker" type="text" maxlength="6" value="BBCA"
+                oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, ''); syncActiveTickerState();"
+                placeholder="BBCA"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white text-base tracking-wider uppercase focus:outline-none transition" />
+              <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">.JK</span>
+            </div>
+          </div>
+
+          <!-- Last Price Input -->
+          <div class="lg:col-span-2">
+            <label for="v36-price" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              Last Price (Rp)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-slate-500">Rp</span>
+              <input id="v36-price" type="number" min="1" step="1" value="9175"
+                oninput="syncActiveTickerState()"
+                placeholder="9175"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl pl-8 pr-3 py-2.5 font-mono font-bold text-white text-base tabular-nums focus:outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Dual-Engine Strategy Mode Toggle -->
+          <div class="sm:col-span-2 lg:col-span-4">
+            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              Dual-Engine Strategy Mode
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" id="mode-btn-intraday" onclick="setStrategyMode('Intraday / BSJP')"
+                class="px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-cyan-500/15 border-cyan-500/50 text-cyan-300 shadow-sm">
+                <span>⚡</span>
+                <span>Intraday / BSJP</span>
+              </button>
+              <button type="button" id="mode-btn-swing" onclick="setStrategyMode('Swing Multi-Hari')"
+                class="px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-[#060a12] border-[#1e293b] text-slate-400 hover:text-slate-200 hover:border-slate-700">
+                <span>📈</span>
+                <span>Swing Multi-Hari</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Toolbar Quick Actions -->
+          <div class="sm:col-span-2 lg:col-span-4 flex flex-wrap items-center gap-2 lg:justify-end">
+            <button type="button" onclick="loadSampleBroksum('ACCUM')"
+              class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 transition">
+              Muat Sample Broksum
+            </button>
+            <button type="button" onclick="openTradingView()"
+              class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#131c31] hover:bg-slate-800 text-slate-200 border border-[#1e293b] hover:border-cyan-500/40 transition flex items-center justify-center gap-1.5">
+              <span>TradingView</span>
+              <span class="text-cyan-400">↗</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 3-SOURCE BROKER SUMMARY INPUT PANEL -->
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1e293b] pb-3.5">
+          <!-- 3 Sub-Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="switchInputSubTab('text')" id="subtab-text"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/40">
+              <span>📋</span>
+              <span>Tempel Teks Broksum</span>
+            </button>
+
+            <button type="button" onclick="switchInputSubTab('ocr')" id="subtab-ocr"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-[#060a12] text-slate-400 border border-[#1e293b] hover:text-slate-200">
+              <span>📸</span>
+              <span>OCR Screenshot Reader</span>
+            </button>
+
+            <button type="button" onclick="switchInputSubTab('json')" id="subtab-json"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-[#060a12] text-slate-400 border border-[#1e293b] hover:text-slate-200">
+              <span>🔌</span>
+              <span>Stockbit JSON Bridge</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+            <span>Simulasi Cepat:</span>
+            <button type="button" onclick="loadSampleBroksum('ACCUM')" class="text-emerald-400 hover:underline">Big Accum</button>
+            <span>•</span>
+            <button type="button" onclick="loadSampleBroksum('DISTRIB')" class="text-rose-400 hover:underline">Distribusi Ritel</button>
+          </div>
+        </div>
+
+        <!-- SUB-TAB A: TEMPEL TEKS BROKSUM -->
+        <div id="subview-text" class="space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+            <span>Tempel hasil copy-paste Broker Summary Stockbit (format kolom Buy/Sell dengan <code class="text-cyan-300 font-mono">|</code> atau per baris).</span>
+            <span class="font-mono text-[11px] text-slate-500">Kode Broker • Lot • Value • Avg</span>
+          </div>
+          <textarea id="v36-text-input" rows="6"
+            class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl p-3.5 font-mono text-xs sm:text-[13px] leading-relaxed text-slate-100 placeholder-slate-600 focus:outline-none transition"
+            placeholder="Contoh:
+ZP 195,000 178.4B 9,150 | YP 142,800 130.9B 9,170
+AK 138,500 126.9B 9,160 | XL 118,500 108.7B 9,175
+BK 92,000  84.3B  9,165 | XC 84,200  77.2B  9,170"></textarea>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-[11px] text-slate-500">Klasifikasi otomatis: <span class="text-cyan-400">Foreign Inst</span>, <span class="text-emerald-400">Local Inst</span>, <span class="text-amber-400">Retail</span></span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="document.getElementById('v36-text-input').value=''"
+                class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#060a12] hover:bg-slate-800 text-slate-400 border border-[#1e293b] transition">
+                Bersihkan
+              </button>
+              <button type="button" onclick="runV36TextAnalysis()"
+                class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition">
+                ⚡ Analisis X-Ray V36
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB B: OCR SCREENSHOT READER -->
+        <div id="subview-ocr" class="hidden space-y-3">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+            <label id="ocr-dropzone" for="ocr-file-input"
+              class="lg:col-span-7 border-2 border-dashed border-[#1e293b] hover:border-cyan-500/60 bg-[#060a12] hover:bg-[#131c31]/60 rounded-2xl p-5 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[170px]">
+              <svg class="w-9 h-9 text-cyan-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              <span class="text-xs sm:text-sm font-bold text-slate-200">
+                Drag & Drop Screenshot, Klik Pilih File, atau Tekan <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-cyan-300">Ctrl + V</kbd>
+              </span>
+              <span class="text-[11px] text-slate-400 mt-1">Mendukung screenshot tabel Broker Summary Stockbit (PNG, JPG, WEBP)</span>
+              <input id="ocr-file-input" type="file" accept="image/*" class="hidden" onchange="handleOcrFile(this.files[0])" />
+            </label>
+
+            <div class="lg:col-span-5 bg-[#060a12] border border-[#1e293b] rounded-2xl p-4 flex flex-col justify-between min-h-[170px]">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-300">OCR Engine Status</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Tesseract.js</span>
+              </div>
+
+              <div class="my-2.5 flex items-center justify-center bg-[#0f172a] border border-[#1e293b] rounded-xl h-20 overflow-hidden">
+                <span id="ocr-empty-label" class="text-[11px] font-mono text-slate-500">Menunggu gambar screenshot...</span>
+                <img id="ocr-thumb" alt="Screenshot Preview" class="hidden max-h-20 w-auto object-contain" />
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between text-[11px] font-mono mb-1">
+                  <span id="ocr-status-text" class="text-slate-400 truncate">Siap membaca gambar (Ctrl+V aktif)</span>
+                  <span id="ocr-pct-text" class="text-cyan-400 tabular-nums">0%</span>
+                </div>
+                <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-[#1e293b]">
+                  <div id="ocr-progress-bar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-200" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB C: STOCKBIT JSON BRIDGE -->
+        <div id="subview-json" class="hidden space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+            <span>Tempel JSON dari Chrome Extension / script browser, atau terima otomatis via Bridge.</span>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="toggleExtensionKit()" class="font-mono text-[11px] text-emerald-400 hover:underline font-bold">
+                🧩 Kit Chrome Extension (MV3)
+              </button>
+              <span class="text-slate-600">|</span>
+              <button type="button" onclick="loadSampleJson()" class="font-mono text-[11px] text-cyan-400 hover:underline">
+                Isi Contoh JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Collapsible Chrome Extension Manifest V3 Kit -->
+          <div id="extension-kit-drawer" class="hidden bg-[#060a12] border border-cyan-500/35 rounded-2xl p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1e293b] pb-2.5">
+              <div>
+                <h4 class="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">Whale X-Ray Stockbit Extractor (Chrome Extension MV3)</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Simpan 2 file di bawah ke satu folder, lalu buka <code class="text-cyan-300 font-mono">chrome://extensions</code> → aktifkan <strong>Developer Mode</strong> → klik <strong>Load unpacked</strong>.</p>
+              </div>
+              <button type="button" onclick="toggleExtensionKit()" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800/80">
+                Tutup ✕
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <!-- File 1: manifest.json -->
+              <div class="bg-[#0f172a] border border-[#1e293b] rounded-xl p-3 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-xs font-bold text-amber-300">1. manifest.json</span>
+                  <button type="button" onclick="copyExtensionFile('manifest')"
+                    class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 transition">
+                    📋 Copy manifest.json
+                  </button>
+                </div>
+                <pre id="ext-code-manifest" class="text-[11px] font-mono text-slate-300 bg-[#060a12] p-2.5 rounded-lg overflow-x-auto max-h-44 leading-relaxed"></pre>
+              </div>
+
+              <!-- File 2: content.js -->
+              <div class="bg-[#0f172a] border border-[#1e293b] rounded-xl p-3 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-xs font-bold text-emerald-300">2. content.js</span>
+                  <button type="button" onclick="copyExtensionFile('content')"
+                    class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition">
+                    📋 Copy content.js
+                  </button>
+                </div>
+                <pre id="ext-code-content" class="text-[11px] font-mono text-slate-300 bg-[#060a12] p-2.5 rounded-lg overflow-x-auto max-h-44 leading-relaxed"></pre>
+              </div>
+            </div>
+          </div>
+
+          <textarea id="v36-json-input" rows="5"
+            class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl p-3.5 font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition"
+            placeholder='{"ticker":"BBCA","last_price":9175,"brokers":[{"broker":"ZP","buy_lot":195000,"buy_avg":9150,"sell_lot":12000,"sell_avg":9165}]}'></textarea>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onclick="pasteJsonFromClipboard()"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#131c31] hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 transition">
+              📋 Tempel dari Clipboard & Analisis
+            </button>
+            <button type="button" onclick="runV36JsonAnalysis()"
+              class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition">
+              🔌 Parse JSON & Analisis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 4 CORE V36 KPI CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Skor Bandar (0-100) -->
+        <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Skor Bandar (V36)</span>
+            <span id="kpi-engine-tag" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-300 border border-slate-700">Intraday</span>
+          </div>
+          <div class="my-3 flex items-baseline gap-2.5">
+            <span id="kpi-score-val" class="text-3xl sm:text-4xl font-extrabold font-mono text-emerald-400 tabular-nums">--</span>
+            <span class="text-xs font-mono text-slate-500">/ 100</span>
+          </div>
+          <div class="space-y-2">
+            <div class="w-full h-2 bg-[#060a12] rounded-full overflow-hidden border border-[#1e293b]">
+              <div id="kpi-score-bar" class="h-full bg-emerald-400 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span id="kpi-regime-badge" class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35">
+                Menunggu Data
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 2: HHI Monopoly Index -->
+        <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">HHI Monopoly Index</span>
+            <span class="text-[10px] font-mono text-slate-500">∑sᵢ²</span>
+          </div>
+          <div class="my-3 flex items-baseline gap-2">
+            <span id="kpi-hhi-val" class="text-3xl sm:text-4xl font-extrabold font-mono text-cyan-400 tabular-nums">--</span>
+            <span class="text-xs font-mono text-slate-500">/ 10,000</span>
+          </div>
+          <div>
+            <span id="kpi-hhi-badge" class="inline-block px-2.5 py-0.5 rounded-lg text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35">
+              Buyer Concentration
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Net Institutional Flow -->
+        <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Net Institutional Flow</span>
+            <span class="text-[10px] font-mono text-slate-500">Foreign + Local</span>
+          </div>
+          <div class="my-2.5">
+            <div id="kpi-inst-lot" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 tabular-nums">-- Lot</div>
+            <div id="kpi-inst-val" class="text-xs font-mono text-slate-300 mt-0.5 tabular-nums">Rp 0</div>
+          </div>
+          <div>
+            <span id="kpi-divergence-badge" class="inline-block px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+              Inst vs Retail Flow
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI 4: Sopir Utama (Controlling Broker) -->
+        <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Sopir Utama</span>
+            <span id="kpi-driver-cat" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">--</span>
+          </div>
+          <div class="my-2 flex items-center justify-between">
+            <span id="kpi-driver-code" class="text-3xl sm:text-4xl font-extrabold font-mono text-white tracking-wider">--</span>
+            <div class="text-right font-mono">
+              <div class="text-[11px] text-slate-400">VWAP Beli</div>
+              <div id="kpi-driver-vwap" class="text-base font-bold text-amber-400 tabular-nums">Rp 0</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-xs font-mono pt-1 border-t border-[#1e293b]/80">
+            <span id="kpi-driver-lot" class="text-slate-300 tabular-nums">0 Lot</span>
+            <span id="kpi-driver-float" class="font-bold text-emerald-400 tabular-nums">Float: 0.00%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. TOP BUYERS VS TOP SELLERS SIDE-BY-SIDE TABLES -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Top Buyers Table -->
+        <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wide">Top Net Buyers (Akumulator)</h3>
+            </div>
+            <span id="total-net-buy-summary" class="text-xs font-mono text-emerald-400 tabular-nums">0 Lot</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-[#1e293b] text-[11px] font-semibold uppercase text-slate-400">
+                  <th class="py-2 pr-2">Broker</th>
+                  <th class="py-2 px-2">Tipe</th>
+                  <th class="py-2 px-2 text-right">Net Lot</th>
+                  <th class="py-2 px-2 text-right">Avg</th>
+                  <th class="py-2 pl-2 text-right">Value</th>
+                </tr>
+              </thead>
+              <tbody id="top-buyers-tbody" class="divide-y divide-[#1e293b]/60 text-xs font-mono tabular-nums">
+                <tr><td colspan="5" class="py-6 text-center text-slate-500">Belum ada data buyer</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Top Sellers Table -->
+        <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wide">Top Net Sellers (Distributor)</h3>
+            </div>
+            <span id="total-net-sell-summary" class="text-xs font-mono text-rose-400 tabular-nums">0 Lot</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-[#1e293b] text-[11px] font-semibold uppercase text-slate-400">
+                  <th class="py-2 pr-2">Broker</th>
+                  <th class="py-2 px-2">Tipe</th>
+                  <th class="py-2 px-2 text-right">Net Lot</th>
+                  <th class="py-2 px-2 text-right">Avg</th>
+                  <th class="py-2 pl-2 text-right">Value</th>
+                </tr>
+              </thead>
+              <tbody id="top-sellers-tbody" class="divide-y divide-[#1e293b]/60 text-xs font-mono tabular-nums">
+                <tr><td colspan="5" class="py-6 text-center text-slate-500">Belum ada data seller</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. GOOGLE SHEETS JOURNAL EXPORT BAR -->
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-white">Google Sheets Trading Journal Bridge</h4>
+          <p class="text-[11px] text-slate-400">Salin baris tab-separated siap tempel ke Google Sheets atau unduh file CSV riwayat analisis.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="copyJournalRow()"
+            class="px-4 py-2 rounded-xl text-xs font-bold bg-[#131c31] hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1.5">
+            <span>📋</span>
+            <span>Copy Baris Jurnal</span>
+          </button>
+          <button type="button" onclick="downloadJournalCsv()"
+            class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1.5">
+            <span>📥</span>
+            <span>Download CSV</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: 🧮 BANDAR PAIN & MARK-UP                                           -->
+    <!-- ========================================================================= -->
+    <section id="panel-pain" class="hidden tab-panel space-y-5">
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+            <span>🧮</span>
+            <span>Bandar Pain & Mark-Up Distribution Simulator</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Pemetaan batas psikologis cut-loss bandar (Pain Floors) dan zona distribusi mark-up dari VWAP pengendali.</p>
+        </div>
+        <button type="button" onclick="syncRadarToPain()"
+          class="px-4 py-2.5 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/45 transition shrink-0">
+          📥 Tarik Data dari Radar V36
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Left Inputs -->
+        <div class="lg:col-span-5 bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 space-y-4 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-[#1e293b] pb-2.5">Parameter Modal Pengendali</h3>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="pain-ticker" class="block text-xs text-slate-400 mb-1.5">Ticker</label>
+              <input id="pain-ticker" type="text" value="BBCA" oninput="this.value=this.value.toUpperCase(); calculateBandarPain();"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white uppercase focus:outline-none" />
+            </div>
+            <div>
+              <label for="pain-driver" class="block text-xs text-slate-400 mb-1.5">Kode Sopir Utama</label>
+              <input id="pain-driver" type="text" value="ZP" maxlength="3" oninput="this.value=this.value.toUpperCase(); calculateBandarPain();"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-cyan-300 uppercase focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="pain-vwap" class="block text-xs text-slate-400 mb-1.5">Bandar VWAP (Rp)</label>
+              <input id="pain-vwap" type="number" value="9150" min="1" oninput="calculateBandarPain()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-amber-400 tabular-nums focus:outline-none" />
+            </div>
+            <div>
+              <label for="pain-last" class="block text-xs text-slate-400 mb-1.5">Last Price (Rp)</label>
+              <input id="pain-last" type="number" value="9175" min="1" oninput="calculateBandarPain()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white tabular-nums focus:outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label for="pain-lot" class="block text-xs text-slate-400 mb-1.5">Estimasi Akumulasi Lot Bandar</label>
+            <input id="pain-lot" type="number" value="195000" min="0" oninput="calculateBandarPain()"
+              class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-slate-200 tabular-nums focus:outline-none" />
+          </div>
+
+          <!-- Controller Floating P/L Card -->
+          <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Controller Floating P/L (%):</span>
+              <span id="pain-float-pct" class="font-mono font-extrabold text-base text-emerald-400 tabular-nums">+0.27%</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Estimasi Floating P/L (Rp):</span>
+              <span id="pain-float-rp" class="font-mono font-bold text-slate-200 tabular-nums">+Rp 48.750.000</span>
+            </div>
+            <div class="pt-1 border-t border-[#1e293b] text-[11px] font-mono text-cyan-300" id="pain-regime-note">
+              Status: Bandar berada di atas modal rata-rata (Zona Kontrol Aman).
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Visual Price Ladder -->
+        <div class="lg:col-span-7 bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 space-y-3 shadow-xl">
+          <div class="flex items-center justify-between border-b border-[#1e293b] pb-2.5">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Interactive Bandar Price Ladder</h3>
+            <span id="pain-ladder-ticker" class="text-xs font-mono font-bold text-cyan-400">IDX: BBCA</span>
+          </div>
+
+          <div id="pain-ladder-container" class="space-y-2.5 font-mono tabular-nums">
+            <!-- Populated dynamically by calculateBandarPain() -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: ⚖️ RDN POSITION SIZER                                              -->
+    <!-- ========================================================================= -->
+    <section id="panel-sizer" class="hidden tab-panel space-y-5">
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+            <span>⚖️</span>
+            <span>RDN Position Sizer & Risk Guardrail</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Kalkulator ukuran lot presisi berbasis risiko per trade dengan pengaman alokasi maksimal 35% per emiten.</p>
+        </div>
+        <button type="button" onclick="syncRadarToSizer()"
+          class="px-4 py-2.5 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/45 transition shrink-0">
+          📥 Tarik Entry Price dari Radar V36
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Left Form -->
+        <div class="lg:col-span-6 bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 space-y-4 shadow-xl">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="sizer-rdn" class="block text-xs text-slate-400 mb-1.5">Total Modal RDN (Rp)</label>
+              <input id="sizer-rdn" type="number" value="100000000" min="100000" step="100000" oninput="calculatePositionSize()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white tabular-nums focus:outline-none" />
+            </div>
+            <div>
+              <label for="sizer-risk-pct" class="block text-xs text-slate-400 mb-1.5">Risk per Trade (%)</label>
+              <input id="sizer-risk-pct" type="number" value="1.0" min="0.1" max="20" step="0.1" oninput="calculatePositionSize()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-amber-400 tabular-nums focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div>
+              <label for="sizer-entry" class="block text-xs text-slate-400 mb-1.5">Entry Price (Rp)</label>
+              <input id="sizer-entry" type="number" value="9175" min="1" oninput="calculatePositionSize()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white tabular-nums focus:outline-none" />
+            </div>
+            <div>
+              <label for="sizer-sl" class="block text-xs text-slate-400 mb-1.5">Stop Loss Price (Rp)</label>
+              <input id="sizer-sl" type="number" value="8850" min="1" oninput="calculatePositionSize()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-rose-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-rose-400 tabular-nums focus:outline-none" />
+            </div>
+            <div>
+              <label for="sizer-tp" class="block text-xs text-slate-400 mb-1.5">Target Price (Rp)</label>
+              <input id="sizer-tp" type="number" value="9900" min="1" oninput="calculatePositionSize()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-emerald-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-emerald-400 tabular-nums focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="bg-[#060a12] border border-dashed border-[#1e293b] rounded-xl p-3.5">
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Fee Sekuritas IDX</div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="sizer-fee-buy" class="block text-xs text-slate-400 mb-1">Fee Beli (%)</label>
+                <input id="sizer-fee-buy" type="number" value="0.15" min="0" step="0.01" oninput="calculatePositionSize()"
+                  class="w-full bg-[#0f172a] border border-[#1e293b] focus:border-cyan-500 rounded-lg px-3 py-2 font-mono text-sm text-white tabular-nums focus:outline-none" />
+              </div>
+              <div>
+                <label for="sizer-fee-sell" class="block text-xs text-slate-400 mb-1">Fee Jual (%)</label>
+                <input id="sizer-fee-sell" type="number" value="0.25" min="0" step="0.01" oninput="calculatePositionSize()"
+                  class="w-full bg-[#0f172a] border border-[#1e293b] focus:border-cyan-500 rounded-lg px-3 py-2 font-mono text-sm text-white tabular-nums focus:outline-none" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Results -->
+        <div class="lg:col-span-6 bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Rekomendasi Eksekusi Order</span>
+            <span id="sizer-cap-badge" class="px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35">
+              Guardrail 35% Aman
+            </span>
+          </div>
+
+          <!-- Primary Lot & R:R Banner -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-[#060a12] border border-cyan-500/35 rounded-xl p-4">
+              <div class="text-[11px] uppercase tracking-wider text-slate-400">Recommended Lot Size</div>
+              <div id="sizer-res-lot" class="text-2xl sm:text-3xl font-extrabold font-mono text-cyan-400 mt-1 tabular-nums">0 Lot</div>
+              <div id="sizer-res-shares" class="text-[11px] font-mono text-slate-500 mt-0.5 tabular-nums">0 Lembar</div>
+            </div>
+
+            <div class="bg-[#060a12] border border-emerald-500/35 rounded-xl p-4">
+              <div class="text-[11px] uppercase tracking-wider text-slate-400">Net Risk : Reward</div>
+              <div id="sizer-res-rr" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 mt-1 tabular-nums">1 : 0.00</div>
+              <div id="sizer-res-rr-label" class="text-[11px] font-mono text-emerald-300 mt-0.5">Optimal Setup</div>
+            </div>
+          </div>
+
+          <!-- Detailed Breakdown -->
+          <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4 space-y-2.5 text-xs font-mono tabular-nums">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Total Buy Value (incl. Fee):</span>
+              <span id="sizer-res-buyval" class="font-bold text-white">Rp 0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">% of RDN Used (Max 35%):</span>
+              <span id="sizer-res-rdn-pct" class="font-bold text-cyan-300">0.00%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-[#1e293b]">
+              <div id="sizer-rdn-bar" class="h-full bg-cyan-400 transition-all duration-200" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-[#1e293b]">
+              <span class="text-slate-400">Net Risk (jika kena Stop Loss):</span>
+              <span id="sizer-res-risk-rp" class="font-bold text-rose-400">-Rp 0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Net Reward (jika kena Target):</span>
+              <span id="sizer-res-reward-rp" class="font-bold text-emerald-400">+Rp 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: 📡 BATCH BSJP RADAR                                                -->
+    <!-- ========================================================================= -->
+    <section id="panel-batch" class="hidden tab-panel space-y-5">
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+            <span>📡</span>
+            <span>Batch BSJP Radar (Pre-Closing Scanner 15:30–15:50 WIB)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Bandingkan kandidat akumulasi menjelang penutupan pasar dan buka emiten terpilih langsung di Radar Utama V36.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="batch-sort-select" class="text-xs text-slate-400">Urutkan:</label>
+          <select id="batch-sort-select" onchange="renderBatchTable()"
+            class="bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500">
+            <option value="score">Skor Bandar (Tertinggi)</option>
+            <option value="hhi">HHI Monopoly (Tertinggi)</option>
+            <option value="instLot">Net Inst Lot (Terbesar)</option>
+            <option value="ticker">Ticker (A–Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Add Ticker to Watchlist Form -->
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 shadow-xl">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Tambah Emiten ke Watchlist BSJP</div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 items-end">
+          <div>
+            <label for="batch-in-ticker" class="block text-[11px] text-slate-400 mb-1">Ticker</label>
+            <input id="batch-in-ticker" type="text" maxlength="6" placeholder="ANTM" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs font-bold text-white uppercase focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <label for="batch-in-price" class="block text-[11px] text-slate-400 mb-1">Last Price</label>
+            <input id="batch-in-price" type="number" placeholder="1645"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs text-white tabular-nums focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <label for="batch-in-driver" class="block text-[11px] text-slate-400 mb-1">Sopir Utama</label>
+            <input id="batch-in-driver" type="text" maxlength="3" placeholder="AK" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs font-bold text-cyan-300 uppercase focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <label for="batch-in-avg" class="block text-[11px] text-slate-400 mb-1">Bandar Avg</label>
+            <input id="batch-in-avg" type="number" placeholder="1635"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs text-amber-400 tabular-nums focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <label for="batch-in-lot" class="block text-[11px] text-slate-400 mb-1">Net Inst Lot</label>
+            <input id="batch-in-lot" type="number" placeholder="145000"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs text-emerald-400 tabular-nums focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <label for="batch-in-hhi" class="block text-[11px] text-slate-400 mb-1">HHI</label>
+            <input id="batch-in-hhi" type="number" placeholder="2680"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs text-white tabular-nums focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <label for="batch-in-score" class="block text-[11px] text-slate-400 mb-1">Skor (0-100)</label>
+            <input id="batch-in-score" type="number" min="0" max="100" placeholder="84"
+              class="w-full bg-[#060a12] border border-[#1e293b] rounded-xl px-3 py-2 font-mono text-xs text-white tabular-nums focus:border-cyan-500 focus:outline-none" />
+          </div>
+          <div>
+            <button type="button" onclick="addBatchTicker()"
+              class="w-full py-2 px-3 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition">
+              + Tambah
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sortable Watchlist Ranking Table -->
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 shadow-xl overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[760px]">
+          <thead>
+            <tr class="border-b border-[#1e293b] text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <th class="py-2.5 pr-3">Rank</th>
+              <th class="py-2.5 px-3">Ticker</th>
+              <th class="py-2.5 px-3 text-right">Last Price</th>
+              <th class="py-2.5 px-3 text-center">Sopir</th>
+              <th class="py-2.5 px-3 text-right">Bandar Avg</th>
+              <th class="py-2.5 px-3 text-right">Net Inst Lot</th>
+              <th class="py-2.5 px-3 text-right">HHI</th>
+              <th class="py-2.5 px-3 text-right">Skor Bandar</th>
+              <th class="py-2.5 pl-3 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="batch-tbody" class="divide-y divide-[#1e293b]/70 text-xs font-mono tabular-nums">
+            <!-- Populated dynamically by renderBatchTable() -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 5: 📊 AVERAGE & BEP CALCULATOR (RESTYLED TO MATCH WHALE X-RAY V36 UI) -->
+    <!-- ========================================================================= -->
+    <section id="panel-bep" class="hidden tab-panel space-y-5">
+
+      <!-- Quick Sync Bar -->
+      <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+            <span>📊</span>
+            <span>Kalkulator Average & Harga Jual BEP (Net Fee IDX)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Simulasi Average Down / Average Up beserta titik impas bersih setelah fee beli & fee jual sekuritas.</p>
+        </div>
+        <button type="button" onclick="syncRadarToBep()"
+          class="px-4 py-2.5 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/45 transition shrink-0">
+          📥 Tarik Last Price & Avg Bandar dari Radar V36
+        </button>
+      </div>
+
+      <!-- 2-Column Desktop Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- LEFT COLUMN: INPUTS & FEE PARAMETERS -->
+        <div class="lg:col-span-6 bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 space-y-4 shadow-xl">
+          <div class="flex items-center justify-between border-b border-[#1e293b] pb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Parameter Posisi Portofolio</span>
+            <span id="bep-sync-ticker-pill" class="text-[11px] font-mono px-2.5 py-0.5 rounded bg-[#060a12] border border-[#1e293b] text-cyan-300">
+              Active: BBCA
+            </span>
+          </div>
+
+          <!-- Row 1: Old Avg & Old Lot -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="bep-old-avg" class="block text-xs font-medium text-slate-300 mb-1.5">
+                Harga Avg Saat Ini (Rp)
+              </label>
+              <input id="bep-old-avg" type="number" min="0" step="1" placeholder="Contoh: 9500"
+                oninput="calculateBepAvg()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white tabular-nums focus:outline-none transition" />
+            </div>
+            <div>
+              <label for="bep-old-lot" class="block text-xs font-medium text-slate-300 mb-1.5">
+                Jumlah Lot Dimiliki
+              </label>
+              <input id="bep-old-lot" type="number" min="0" step="1" placeholder="Contoh: 50"
+                oninput="calculateBepAvg()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-white tabular-nums focus:outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Row 2: New Buy Price & New Lot -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="bep-new-price" class="block text-xs font-medium text-slate-300 mb-1.5">
+                Harga Beli Baru (Rp)
+              </label>
+              <input id="bep-new-price" type="number" min="0" step="1" placeholder="Contoh: 9175"
+                oninput="calculateBepAvg()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-cyan-300 tabular-nums focus:outline-none transition" />
+            </div>
+            <div>
+              <label for="bep-new-lot" class="block text-xs font-medium text-slate-300 mb-1.5">
+                Jumlah Lot Baru
+              </label>
+              <input id="bep-new-lot" type="number" min="0" step="1" placeholder="Contoh: 100"
+                oninput="calculateBepAvg()"
+                class="w-full bg-[#060a12] border border-[#1e293b] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 font-mono font-bold text-cyan-300 tabular-nums focus:outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Fee Section -->
+          <div class="bg-[#060a12] border border-dashed border-[#1e293b] rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Estimasi Fee Sekuritas</span>
+              <span class="text-[10px] font-mono text-slate-500">Standar Ritel IDX</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="bep-fee-beli" class="block text-xs text-slate-400 mb-1">Fee Beli (%)</label>
+                <input id="bep-fee-beli" type="number" value="0.15" step="0.01" min="0"
+                  oninput="calculateBepAvg()"
+                  class="w-full bg-[#0f172a] border border-[#1e293b] focus:border-cyan-500 rounded-lg px-3 py-2 font-mono text-sm text-white tabular-nums focus:outline-none transition" />
+              </div>
+              <div>
+                <label for="bep-fee-jual" class="block text-xs text-slate-400 mb-1">Fee Jual (%)</label>
+                <input id="bep-fee-jual" type="number" value="0.25" step="0.01" min="0"
+                  oninput="calculateBepAvg()"
+                  class="w-full bg-[#0f172a] border border-[#1e293b] focus:border-cyan-500 rounded-lg px-3 py-2 font-mono text-sm text-white tabular-nums focus:outline-none transition" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Primary Action & Reset Buttons -->
+          <div class="grid grid-cols-3 gap-3 pt-1">
+            <button type="button" onclick="calculateBepAvg(true)"
+              class="col-span-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition">
+              Hitung Average & BEP
+            </button>
+            <button type="button" onclick="resetBepCalculator()"
+              class="py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold bg-[#060a12] hover:bg-slate-800 text-slate-300 border border-[#1e293b] transition">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: LIVE OUTPUT & DIAGNOSTICS -->
+        <div class="lg:col-span-6 bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 space-y-4 shadow-xl">
+          <!-- Top Status & Strategy Detection Badge -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1e293b] pb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Hasil Simulasi & Break-Even</span>
+            <span id="bep-action-badge" class="px-3 py-1 rounded-full text-xs font-mono font-extrabold bg-slate-800 text-slate-300 border border-slate-700">
+              POSISI BARU / NETRAL
+            </span>
+          </div>
+
+          <!-- Bandar VWAP Benchmark Banner (Visible when Radar V36 data is available) -->
+          <div id="bep-bandar-compare-box" class="bg-[#060a12] border border-[#1e293b] rounded-xl p-3.5 flex items-center justify-between gap-3">
+            <div class="text-xs">
+              <div class="text-slate-400">Benchmark Sopir Utama (<span id="bep-bench-driver" class="font-mono font-bold text-cyan-300">ZP</span>):</div>
+              <div id="bep-bench-msg" class="text-[11px] text-slate-300 mt-0.5">Masukkan harga & lot untuk membandingkan BEP Anda vs modal bandar.</div>
+            </div>
+            <div class="text-right font-mono shrink-0">
+              <div class="text-[10px] text-slate-500">VWAP Bandar</div>
+              <div id="bep-bench-vwap" class="text-sm font-bold text-amber-400 tabular-nums">Rp 9.150</div>
+            </div>
+          </div>
+
+          <!-- Highlighted KPI Cards: Average Harga Baru & Harga Jual BEP -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Average Harga Baru -->
+            <div class="bg-[#060a12] border border-cyan-500/40 rounded-2xl p-4 shadow-inner">
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-cyan-400">Average Harga Baru</div>
+              <div id="bep-res-new-avg" class="text-2xl sm:text-3xl font-extrabold font-mono text-white mt-1.5 tabular-nums">
+                Rp 0
+              </div>
+              <div class="text-[11px] font-mono text-slate-500 mt-1">Termasuk Fee Beli</div>
+            </div>
+
+            <!-- Harga Jual BEP + Nearest Valid IDX Tick -->
+            <div class="bg-[#060a12] border border-amber-500/45 rounded-2xl p-4 shadow-inner">
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-amber-400">Harga Jual BEP</div>
+              <div id="bep-res-bep-price" class="text-2xl sm:text-3xl font-extrabold font-mono text-amber-400 mt-1.5 tabular-nums">
+                Rp 0
+              </div>
+              <div class="text-[11px] font-mono text-emerald-400 mt-1 tabular-nums">
+                Fraksi BEI Valid: <span id="bep-res-idx-tick" class="font-bold">Rp 0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Breakdown Table -->
+          <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4 space-y-2.5 text-xs sm:text-sm font-mono tabular-nums">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 font-sans">Total Lot Keseluruhan:</span>
+              <strong id="bep-res-total-lot" class="text-white">0 Lot</strong>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 font-sans">Dana Beli Tambahan (incl. Fee):</span>
+              <strong id="bep-res-fund-needed" class="text-cyan-300">Rp 0</strong>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 font-sans">Total Modal Keseluruhan:</span>
+              <strong id="bep-res-total-modal" class="text-slate-200">Rp 0</strong>
+            </div>
+            <div class="pt-2 border-t border-[#1e293b] flex items-center justify-between">
+              <span class="text-slate-400 font-sans">Floating Sebelum Beli:</span>
+              <strong id="bep-res-float-before" class="text-slate-200">0.00%</strong>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 font-sans">Floating Setelah Beli:</span>
+              <strong id="bep-res-float-after" class="text-slate-200">0.00%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-[#1e293b] bg-[#060a12]/90 py-4 px-4 sm:px-6 mt-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500 font-mono">
+      <div>WHALE X-RAY V36.0 MODULAR EDITION • IDX / IHSG QUANTITATIVE TERMINAL</div>
+      <div>Data & Kalkulasi bersifat alat bantu analisis keputusan trading (DYOR).</div>
+    </div>
+  </footer>
+
+  <!-- ==================== SELF-CONTAINED APPLICATION LOGIC ==================== -->
+  <script>
+    /* =========================================================================
+       1. GLOBAL STATE & BROKER TAXONOMY (IDX / IHSG)
+       ========================================================================= */
+    const BROKER_TAXONOMY = {
+      FOREIGN_INST: new Set(['YP', 'ZP', 'AK', 'KZ', 'RX', 'BK', 'CS', 'DB', 'ML', 'MS', 'UB', 'CG']),
+      LOCAL_INST:   new Set(['CC', 'NI', 'OD', 'DX', 'IF', 'LG', 'MG', 'SQ', 'HP', 'KI']),
+      RETAIL:       new Set(['XL', 'XC', 'PD', 'KK', 'GR', 'EP', 'DR', 'AZ'])
+    };
+
+    const whaleState = {
+      activeTab: 'radar',
+      ticker: 'BBCA',
+      lastPrice: 9175,
+      strategyMode: 'Intraday / BSJP',
+      latestScan: null,
+      batchList: [
+        { ticker: 'BBCA', lastPrice: 9175, driver: 'ZP', avg: 9150, instLot: 284500, hhi: 2740, score: 86 },
+        { ticker: 'ADRO', lastPrice: 3820, driver: 'AK', avg: 3790, instLot: 412000, hhi: 2410, score: 81 },
+        { ticker: 'BREN', lastPrice: 7450, driver: 'BK', avg: 7375, instLot: 165000, hhi: 2920, score: 88 },
+        { ticker: 'AMMN', lastPrice: 9650, driver: 'KZ', avg: 9600, instLot: 98000,  hhi: 2150, score: 75 },
+        { ticker: 'BBRI', lastPrice: 4680, driver: 'RX', avg: 4660, instLot: 320000, hhi: 1890, score: 72 },
+        { ticker: 'SSIA', lastPrice: 1185, driver: 'CC', avg: 1170, instLot: 188000, hhi: 2560, score: 79 }
+      ]
+    };
+
+    /* =========================================================================
+       2. FORMATTING & IDX TICK SIZE HELPERS
+       ========================================================================= */
+    function formatRupiah(num) {
+      if (!isFinite(num)) return 'Rp 0';
+      return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+    }
+
+    function formatCompactValue(num) {
+      const abs = Math.abs(num);
+      const sign = num < 0 ? '-' : '';
+      if (abs >= 1e12) return sign + 'Rp ' + (abs / 1e12).toFixed(2) + 'T';
+      if (abs >= 1e9)  return sign + 'Rp ' + (abs / 1e9).toFixed(2) + 'B';
+      if (abs >= 1e6)  return sign + 'Rp ' + (abs / 1e6).toFixed(1) + 'M';
+      return sign + 'Rp ' + Math.round(abs).toLocaleString('id-ID');
+    }
+
+    // Peraturan BEI II-A Fraksi Harga Saham
+    function getIdxTickSize(price) {
+      if (price < 200) return 1;
+      if (price < 500) return 2;
+      if (price < 2000) return 5;
+      if (price < 5000) return 10;
+      return 25;
+    }
+
+    function roundUpToIdxTick(rawPrice) {
+      if (!rawPrice || rawPrice <= 0) return 0;
+      const ceilInt = Math.ceil(rawPrice);
+      const tick = getIdxTickSize(ceilInt);
+      return Math.ceil(ceilInt / tick) * tick;
+    }
+
+    function roundNearestIdxTick(rawPrice) {
+      if (!rawPrice || rawPrice <= 0) return 0;
+      const tick = getIdxTickSize(rawPrice);
+      return Math.max(tick, Math.round(rawPrice / tick) * tick);
+    }
+
+    function classifyBroker(code) {
+      const clean = (code || '').toUpperCase().trim();
+      if (BROKER_TAXONOMY.FOREIGN_INST.has(clean)) return 'Foreign Inst';
+      if (BROKER_TAXONOMY.LOCAL_INST.has(clean))   return 'Local Inst';
+      if (BROKER_TAXONOMY.RETAIL.has(clean))       return 'Retail';
+      return 'Local Inst';
+    }
+
+    function getCategoryBadgeHtml(cat) {
+      if (cat === 'Foreign Inst') {
+        return '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Foreign</span>';
+      }
+      if (cat === 'Local Inst') {
+        return '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Local Inst</span>';
+      }
+      return '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">Retail</span>';
+    }
+
+    /* =========================================================================
+       3. NON-BLOCKING TOAST NOTIFICATIONS
+       ========================================================================= */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const borderMap = {
+        success: 'border-emerald-500/50 text-emerald-200',
+        warn: 'border-amber-500/50 text-amber-200',
+        error: 'border-rose-500/50 text-rose-200',
+        info: 'border-cyan-500/50 text-cyan-200'
+      };
+      const iconMap = { success: '✅', warn: '⚠️', error: '❌', info: '💠' };
+
+      toast.className = `pointer-events-auto bg-[#0f172a]/95 backdrop-blur-md border ${borderMap[type] || borderMap.info} rounded-xl px-4 py-3 text-xs font-medium shadow-2xl flex items-center gap-2.5 transition-all duration-200`;
+      toast.innerHTML = `<span>${iconMap[type] || '💠'}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        setTimeout(() => toast.remove(), 220);
+      }, 3200);
+    }
+
+    /* =========================================================================
+       4. LIVE JAKARTA (WIB) IDX SESSION CLOCK
+       ========================================================================= */
+    function updateJakartaMarketClock() {
+      try {
+        const now = new Date();
+        const wibString = now.toLocaleTimeString('en-GB', {
+          timeZone: 'Asia/Jakarta',
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        document.getElementById('wib-clock').textContent = `${wibString} WIB`;
+
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Jakarta',
+          weekday: 'short',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: false
+        }).formatToParts(now);
+
+        const weekday = parts.find(p => p.type === 'weekday')?.value || 'Mon';
+        const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '10', 10);
+        const minute = parseInt(parts.find(p => p.type === 'minute')?.value || '0', 10);
+        const totalMins = hour * 60 + minute;
+
+        const labelEl = document.getElementById('wib-session-label');
+        const dotEl = document.getElementById('wib-status-dot');
+
+        if (weekday === 'Sat' || weekday === 'Sun') {
+          labelEl.textContent = 'IDX CLOSED (WEEKEND)';
+          labelEl.className = 'text-slate-400 font-semibold';
+          dotEl.className = 'w-2 h-2 rounded-full bg-slate-500';
+        } else if (totalMins >= 525 && totalMins < 540) {
+          labelEl.textContent = 'PRE-OPENING';
+          labelEl.className = 'text-amber-400 font-semibold';
+          dotEl.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+        } else if ((totalMins >= 540 && totalMins < 720) || (totalMins >= 810 && totalMins < 950)) {
+          labelEl.textContent = 'IDX MARKET OPEN';
+          labelEl.className = 'text-emerald-400 font-semibold';
+          dotEl.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        } else if (totalMins >= 720 && totalMins < 810) {
+          labelEl.textContent = 'IDX SESSION BREAK';
+          labelEl.className = 'text-amber-400 font-semibold';
+          dotEl.className = 'w-2 h-2 rounded-full bg-amber-400';
+        } else if (totalMins >= 950 && totalMins <= 975) {
+          labelEl.textContent = 'PRE-CLOSING / BSJP';
+          labelEl.className = 'text-cyan-400 font-semibold';
+          dotEl.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-pulse';
+        } else {
+          labelEl.textContent = 'POST-TRADING';
+          labelEl.className = 'text-slate-400 font-semibold';
+          dotEl.className = 'w-2 h-2 rounded-full bg-slate-500';
+        }
+      } catch (e) {
+        // Fallback if Intl timezone is restricted
+      }
+    }
+
+    /* =========================================================================
+       5. TOP-LEVEL 5-TAB NAVIGATION & SUB-TAB CONTROLLERS
+       ========================================================================= */
+    function switchMainTab(tabKey) {
+      whaleState.activeTab = tabKey;
+      const tabs = ['radar', 'pain', 'sizer', 'batch', 'bep'];
+
+      tabs.forEach(key => {
+        const panel = document.getElementById(`panel-${key}`);
+        const btn = document.getElementById(`nav-tab-${key}`);
+        if (!panel || !btn) return;
+
+        if (key === tabKey) {
+          panel.classList.remove('hidden');
+          btn.className = 'shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-cyan-500/15 text-cyan-300 border border-cyan-500/45 shadow-sm';
+        } else {
+          panel.classList.add('hidden');
+          btn.className = 'shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 flex items-center gap-2 bg-[#0f172a] text-slate-400 border border-[#1e293b] hover:text-slate-200 hover:border-slate-700';
+        }
+      });
+
+      if (tabKey === 'pain') calculateBandarPain();
+      if (tabKey === 'sizer') calculatePositionSize();
+      if (tabKey === 'batch') renderBatchTable();
+      if (tabKey === 'bep') {
+        updateBepBenchmarkBanner();
+        calculateBepAvg();
+      }
+    }
+
+    function switchInputSubTab(subKey) {
+      const subKeys = ['text', 'ocr', 'json'];
+      subKeys.forEach(k => {
+        const view = document.getElementById(`subview-${k}`);
+        const btn = document.getElementById(`subtab-${k}`);
+        if (k === subKey) {
+          view.classList.remove('hidden');
+          btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/40';
+        } else {
+          view.classList.add('hidden');
+          btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-[#060a12] text-slate-400 border border-[#1e293b] hover:text-slate-200';
+        }
+      });
+    }
+
+    function setStrategyMode(mode) {
+      whaleState.strategyMode = mode;
+      const btnIntra = document.getElementById('mode-btn-intraday');
+      const btnSwing = document.getElementById('mode-btn-swing');
+
+      if (mode === 'Intraday / BSJP') {
+        btnIntra.className = 'px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-cyan-500/15 border-cyan-500/50 text-cyan-300 shadow-sm';
+        btnSwing.className = 'px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-[#060a12] border-[#1e293b] text-slate-400 hover:text-slate-200 hover:border-slate-700';
+      } else {
+        btnSwing.className = 'px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-emerald-500/15 border-emerald-500/50 text-emerald-300 shadow-sm';
+        btnIntra.className = 'px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-[#060a12] border-[#1e293b] text-slate-400 hover:text-slate-200 hover:border-slate-700';
+      }
+
+      document.getElementById('kpi-engine-tag').textContent = mode === 'Intraday / BSJP' ? 'Intraday' : 'Swing';
+      // Re-run analysis if text input has data
+      if (document.getElementById('v36-text-input').value.trim()) {
+        runV36TextAnalysis(true);
+      }
+    }
+
+    function syncActiveTickerState() {
+      const t = (document.getElementById('v36-ticker').value || 'BBCA').toUpperCase().trim();
+      const p = parseFloat(document.getElementById('v36-price').value) || 0;
+      whaleState.ticker = t || 'BBCA';
+      if (p > 0) whaleState.lastPrice = p;
+      document.getElementById('bep-sync-ticker-pill').textContent = `Active: ${whaleState.ticker}`;
+    }
+
+    function openTradingView() {
+      syncActiveTickerState();
+      const url = `https://www.tradingview.com/chart/?symbol=IDX:${encodeURIComponent(whaleState.ticker)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    /* =========================================================================
+       6. TAB 1: V36 BROKER SUMMARY PARSER & BANDARMOLOGY ENGINE
+       ========================================================================= */
+    function parseNumericToken(token) {
+      if (!token) return NaN;
+      let clean = String(token).trim().toUpperCase().replace(/^RP/, '').trim();
+      let mult = 1;
+      if (clean.endsWith('T')) { mult = 1e12; clean = clean.slice(0, -1); }
+      else if (clean.endsWith('B') || clean.endsWith('M')) { mult = 1e9; clean = clean.slice(0, -1); }
+      else if (clean.endsWith('JT')) { mult = 1e6; clean = clean.slice(0, -2); }
+      else if (clean.endsWith('K') || clean.endsWith('RB')) { mult = 1e3; clean = clean.replace(/(K|RB)$/, ''); }
+
+      // Handle comma thousands separators (e.g. 195,000 -> 195000) vs decimal dots
+      if (mult > 1) {
+        clean = clean.replace(/,/g, '.');
+      } else {
+        clean = clean.replace(/,/g, '');
+      }
+      const val = parseFloat(clean);
+      return isNaN(val) ? NaN : val * mult;
+    }
+
+    function parseSideSegment(segmentText) {
+      // Matches 2-letter broker code followed by numeric tokens (Lot, Value, Avg)
+      const tokens = segmentText.replace(/[^\w.,+-]/g, ' ').trim().split(/\s+/);
+      if (tokens.length < 2) return null;
+
+      const codeMatch = tokens[0].toUpperCase().match(/^[A-Z]{2}$/);
+      if (!codeMatch) return null;
+      const code = codeMatch[0];
+
+      const nums = [];
+      for (let i = 1; i < tokens.length; i++) {
+        const n = parseNumericToken(tokens[i]);
+        if (!isNaN(n) && n > 0) nums.push(n);
+      }
+      if (nums.length === 0) return null;
+
+      let lot = 0;
+      let val = 0;
+      let avg = 0;
+
+      if (nums.length === 1) {
+        lot = nums[0];
+        avg = whaleState.lastPrice || 1000;
+        val = lot * 100 * avg;
+      } else if (nums.length === 2) {
+        // Could be (Lot, Avg) or (Lot, Value)
+        lot = nums[0];
+        if (nums[1] > 100000) {
+          val = nums[1];
+          avg = lot > 0 ? val / (lot * 100) : 0;
+        } else {
+          avg = nums[1];
+          val = lot * 100 * avg;
+        }
+      } else {
+        // Standard Stockbit order: BROKER | LOT | VALUE | AVG
+        lot = nums[0];
+        val = nums[1];
+        avg = nums[2];
+        // Sanity check if Value and Avg were swapped
+        if (val < 100000 && avg > 100000) {
+          const tmp = val;
+          val = avg;
+          avg = tmp;
+        }
+      }
+
+      return { code, lot, val, avg };
+    }
+
+    function parseStockbitRawText(rawText) {
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const brokerMap = new Map();
+
+      function upsertBroker(code, buyLot, buyVal, buyAvg, sellLot, sellVal, sellAvg) {
+        if (!brokerMap.has(code)) {
+          brokerMap.set(code, {
+            code,
+            category: classifyBroker(code),
+            buyLot: 0,
+            buyVal: 0,
+            sellLot: 0,
+            sellVal: 0
+          });
+        }
+        const entry = brokerMap.get(code);
+        if (buyLot > 0) {
+          entry.buyLot += buyLot;
+          entry.buyVal += buyVal > 0 ? buyVal : buyLot * 100 * (buyAvg || whaleState.lastPrice);
+        }
+        if (sellLot > 0) {
+          entry.sellLot += sellLot;
+          entry.sellVal += sellVal > 0 ? sellVal : sellLot * 100 * (sellAvg || whaleState.lastPrice);
+        }
+      }
+
+      lines.forEach(line => {
+        if (line.includes('|')) {
+          const parts = line.split('|');
+          const left = parseSideSegment(parts[0]);
+          const right = parseSideSegment(parts[1]);
+          if (left) upsertBroker(left.code, left.lot, left.val, left.avg, 0, 0, 0);
+          if (right) upsertBroker(right.code, 0, 0, 0, right.lot, right.val, right.avg);
+        } else {
+          // Check if line contains two 2-letter broker codes side-by-side without pipe
+          const matches = [...line.matchAll(/\b([A-Z]{2})\b/gi)];
+          if (matches.length >= 2 && matches[1].index > 4) {
+            const leftPart = line.slice(0, matches[1].index);
+            const rightPart = line.slice(matches[1].index);
+            const left = parseSideSegment(leftPart);
+            const right = parseSideSegment(rightPart);
+            if (left) upsertBroker(left.code, left.lot, left.val, left.avg, 0, 0, 0);
+            if (right) upsertBroker(right.code, 0, 0, 0, right.lot, right.val, right.avg);
+          } else {
+            // Single side or Net format (negative lot = net sell)
+            const single = parseSideSegment(line);
+            if (single) {
+              const isNeg = line.includes('-');
+              if (isNeg) {
+                upsertBroker(single.code, 0, 0, 0, single.lot, single.val, single.avg);
+              } else {
+                upsertBroker(single.code, single.lot, single.val, single.avg, 0, 0, 0);
+              }
+            }
+          }
+        }
+      });
+
+      return Array.from(brokerMap.values());
+    }
+
+    function computeBandarmologyMetrics(brokerRecords) {
+      syncActiveTickerState();
+      const buyers = [];
+      const sellers = [];
+
+      let netInstLot = 0;
+      let netInstVal = 0;
+      let netRetailLot = 0;
+      let totalBuyLot = 0;
+      let totalSellLot = 0;
+
+      brokerRecords.forEach(b => {
+        const netLot = b.buyLot - b.sellLot;
+        const netVal = b.buyVal - b.sellVal;
+
+        if (b.category === 'Retail') {
+          netRetailLot += netLot;
+        } else {
+          netInstLot += netLot;
+          netInstVal += netVal;
+        }
+
+        if (netLot > 0) {
+          const avgPrice = b.buyLot > 0 ? b.buyVal / (b.buyLot * 100) : whaleState.lastPrice;
+          buyers.push({
+            code: b.code,
+            category: b.category,
+            netLot,
+            avgPrice,
+            value: netLot * 100 * avgPrice
+          });
+          totalBuyLot += netLot;
+        } else if (netLot < 0) {
+          const absLot = Math.abs(netLot);
+          const avgPrice = b.sellLot > 0 ? b.sellVal / (b.sellLot * 100) : whaleState.lastPrice;
+          sellers.push({
+            code: b.code,
+            category: b.category,
+            netLot: absLot,
+            avgPrice,
+            value: absLot * 100 * avgPrice
+          });
+          totalSellLot += absLot;
+        }
+      });
+
+      buyers.sort((a, b) => b.netLot - a.netLot);
+      sellers.sort((a, b) => b.netLot - a.netLot);
+
+      // Herfindahl-Hirschman Index (HHI) on Net Buyer Lot Shares: sum(s_i^2)
+      let hhi = 0;
+      if (totalBuyLot > 0) {
+        buyers.forEach(b => {
+          const sharePct = (b.netLot / totalBuyLot) * 100;
+          hhi += sharePct * sharePct;
+        });
+      }
+      hhi = Math.round(hhi);
+
+      let hhiLabel = 'Dispersed (< 1,500)';
+      if (hhi > 2500) hhiLabel = 'Monopoly Controller (> 2,500)';
+      else if (hhi >= 1500) hhiLabel = 'Moderate (1,500–2,500)';
+
+      // Sopir Utama (Top Controlling Net Buyer)
+      const driver = buyers[0] || {
+        code: '--',
+        category: 'None',
+        netLot: 0,
+        avgPrice: whaleState.lastPrice,
+        value: 0
+      };
+      const driverFloatPct = driver.avgPrice > 0
+        ? ((whaleState.lastPrice - driver.avgPrice) / driver.avgPrice) * 100
+        : 0;
+
+      // V36 Bandar Score (0 - 100) calibrated by Strategy Engine Mode
+      const top3BuyLot = buyers.slice(0, 3).reduce((acc, x) => acc + x.netLot, 0);
+      const top3SellLot = sellers.slice(0, 3).reduce((acc, x) => acc + x.netLot, 0);
+      const concentrationRatio = (top3BuyLot + top3SellLot) > 0
+        ? (top3BuyLot - top3SellLot) / (top3BuyLot + top3SellLot)
+        : 0;
+
+      const totalVolumeLot = totalBuyLot + totalSellLot;
+      const instFlowRatio = totalVolumeLot > 0 ? netInstLot / totalVolumeLot : 0;
+      const hhiNorm = Math.min(hhi / 3500, 1);
+
+      let rawScore = 50;
+      if (whaleState.strategyMode === 'Intraday / BSJP') {
+        rawScore = 50 + (instFlowRatio * 34) + (concentrationRatio * 20) + (hhiNorm * 12);
+      } else {
+        // Swing Multi-Hari puts higher weight on sustained institutional flow & low VWAP chase
+        const chasePenalty = driverFloatPct > 6 ? -6 : 2;
+        rawScore = 50 + (instFlowRatio * 40) + (concentrationRatio * 16) + (hhiNorm * 8) + chasePenalty;
+      }
+      const bandarScore = Math.max(0, Math.min(100, Math.round(rawScore)));
+
+      let regimeLabel = 'Neutral / Churning';
+      let regimeTone = 'amber';
+      if (bandarScore >= 80) { regimeLabel = 'Big Accumulation'; regimeTone = 'emerald'; }
+      else if (bandarScore >= 62) { regimeLabel = 'Accumulation'; regimeTone = 'cyan'; }
+      else if (bandarScore >= 42) { regimeLabel = 'Neutral / Churning'; regimeTone = 'amber'; }
+      else if (bandarScore >= 25) { regimeLabel = 'Distribution'; regimeTone = 'rose'; }
+      else { regimeLabel = 'Big Distribution'; regimeTone = 'rose'; }
+
+      let divergenceLabel = 'Neutral Flow';
+      if (netInstLot > 0 && netRetailLot < 0) divergenceLabel = 'Smart Money Inflow vs Retail Outflow';
+      else if (netInstLot < 0 && netRetailLot > 0) divergenceLabel = 'Institutional Dist vs Retail Absorption';
+      else if (netInstLot > 0) divergenceLabel = 'Net Institutional Accumulation';
+      else if (netInstLot < 0) divergenceLabel = 'Net Institutional Distribution';
+
+      const scanResult = {
+        ticker: whaleState.ticker,
+        lastPrice: whaleState.lastPrice,
+        strategyMode: whaleState.strategyMode,
+        bandarScore,
+        regimeLabel,
+        regimeTone,
+        hhi,
+        hhiLabel,
+        netInstLot,
+        netInstVal,
+        netRetailLot,
+        divergenceLabel,
+        controllerCode: driver.code,
+        controllerCategory: driver.category,
+        controllerLot: driver.netLot,
+        controllerVwap: Math.round(driver.avgPrice),
+        controllerFloatPct: driverFloatPct,
+        buyers,
+        sellers,
+        totalBuyLot,
+        totalSellLot
+      };
+
+      whaleState.latestScan = scanResult;
+      renderV36Dashboard(scanResult);
+      updateBepBenchmarkBanner();
+    }
+
+    function renderV36Dashboard(scan) {
+      // KPI 1: Bandar Score
+      const scoreEl = document.getElementById('kpi-score-val');
+      const barEl = document.getElementById('kpi-score-bar');
+      const badgeEl = document.getElementById('kpi-regime-badge');
+
+      scoreEl.textContent = scan.bandarScore;
+      barEl.style.width = `${scan.bandarScore}%`;
+      badgeEl.textContent = scan.regimeLabel;
+
+      const toneStyles = {
+        emerald: {
+          text: 'text-emerald-400',
+          bar: 'bg-emerald-400',
+          badge: 'px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35'
+        },
+        cyan: {
+          text: 'text-cyan-400',
+          bar: 'bg-cyan-400',
+          badge: 'px-2.5 py-0.5 rounded-lg text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35'
+        },
+        amber: {
+          text: 'text-amber-400',
+          bar: 'bg-amber-400',
+          badge: 'px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/35'
+        },
+        rose: {
+          text: 'text-rose-400',
+          bar: 'bg-rose-400',
+          badge: 'px-2.5 py-0.5 rounded-lg text-xs font-bold bg-rose-500/15 text-rose-300 border border-rose-500/35'
+        }
+      };
+      const st = toneStyles[scan.regimeTone] || toneStyles.amber;
+      scoreEl.className = `text-3xl sm:text-4xl font-extrabold font-mono ${st.text} tabular-nums`;
+      barEl.className = `h-full ${st.bar} transition-all duration-300`;
+      badgeEl.className = st.badge;
+
+      // KPI 2: HHI Monopoly Index
+      document.getElementById('kpi-hhi-val').textContent = scan.hhi.toLocaleString('id-ID');
+      const hhiBadge = document.getElementById('kpi-hhi-badge');
+      hhiBadge.textContent = scan.hhiLabel;
+      if (scan.hhi > 2500) {
+        hhiBadge.className = 'inline-block px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35';
+      } else if (scan.hhi >= 1500) {
+        hhiBadge.className = 'inline-block px-2.5 py-0.5 rounded-lg text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35';
+      } else {
+        hhiBadge.className = 'inline-block px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/35';
+      }
+
+      // KPI 3: Net Institutional Flow
+      const instLotEl = document.getElementById('kpi-inst-lot');
+      const instPrefix = scan.netInstLot > 0 ? '+' : '';
+      instLotEl.textContent = `${instPrefix}${Math.round(scan.netInstLot).toLocaleString('id-ID')} Lot`;
+      instLotEl.className = `text-2xl sm:text-3xl font-extrabold font-mono tabular-nums ${scan.netInstLot >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      document.getElementById('kpi-inst-val').textContent = formatCompactValue(scan.netInstVal);
+      document.getElementById('kpi-divergence-badge').textContent = scan.divergenceLabel;
+
+      // KPI 4: Sopir Utama
+      document.getElementById('kpi-driver-code').textContent = scan.controllerCode;
+      document.getElementById('kpi-driver-cat').textContent = scan.controllerCategory;
+      document.getElementById('kpi-driver-vwap').textContent = formatRupiah(scan.controllerVwap);
+      document.getElementById('kpi-driver-lot').textContent = `${Math.round(scan.controllerLot).toLocaleString('id-ID')} Lot`;
+
+      const floatEl = document.getElementById('kpi-driver-float');
+      const fSign = scan.controllerFloatPct > 0 ? '+' : '';
+      floatEl.textContent = `Float: ${fSign}${scan.controllerFloatPct.toFixed(2)}%`;
+      floatEl.className = `font-bold tabular-nums ${scan.controllerFloatPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      // Side-by-Side Tables
+      renderSideTable('top-buyers-tbody', scan.buyers, scan.totalBuyLot, 'emerald');
+      renderSideTable('top-sellers-tbody', scan.sellers, scan.totalSellLot, 'rose');
+      document.getElementById('total-net-buy-summary').textContent = `${Math.round(scan.totalBuyLot).toLocaleString('id-ID')} Lot`;
+      document.getElementById('total-net-sell-summary').textContent = `${Math.round(scan.totalSellLot).toLocaleString('id-ID')} Lot`;
+    }
+
+    function renderSideTable(tbodyId, rows, totalLot, colorKey) {
+      const tbody = document.getElementById(tbodyId);
+      if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-500">Tidak ada data</td></tr>';
+        return;
+      }
+
+      const barColor = colorKey === 'emerald' ? 'bg-emerald-500/35' : 'bg-rose-500/35';
+      const lotTextColor = colorKey === 'emerald' ? 'text-emerald-400' : 'text-rose-400';
+
+      tbody.innerHTML = rows.slice(0, 8).map(r => {
+        const sharePct = totalLot > 0 ? Math.min(100, (r.netLot / totalLot) * 100) : 0;
+        return `
+          <tr class="hover:bg-[#131c31]/60 transition">
+            <td class="py-2 pr-2 font-extrabold text-white">${r.code}</td>
+            <td class="py-2 px-2">${getCategoryBadgeHtml(r.category)}</td>
+            <td class="py-2 px-2 text-right font-bold ${lotTextColor}">
+              <div>${Math.round(r.netLot).toLocaleString('id-ID')}</div>
+              <div class="w-full h-1 bg-slate-900 rounded-full overflow-hidden mt-1">
+                <div class="h-full ${barColor}" style="width: ${sharePct.toFixed(1)}%"></div>
+              </div>
+            </td>
+            <td class="py-2 px-2 text-right text-slate-300">${Math.round(r.avgPrice).toLocaleString('id-ID')}</td>
+            <td class="py-2 pl-2 text-right text-slate-400">${formatCompactValue(r.value)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function runV36TextAnalysis(silent = false) {
+      const raw = document.getElementById('v36-text-input').value.trim();
+      if (!raw) {
+        if (!silent) showToast('Masukkan teks Broker Summary terlebih dahulu.', 'warn');
+        return;
+      }
+      const parsed = parseStockbitRawText(raw);
+      if (parsed.length === 0) {
+        if (!silent) showToast('Format broker tidak terbaca. Pastikan ada kode 2 huruf & lot.', 'error');
+        return;
+      }
+      computeBandarmologyMetrics(parsed);
+      if (!silent) showToast(`Analisis V36 selesai untuk ${whaleState.ticker} (${parsed.length} broker).`, 'success');
+    }
+
+    function loadSampleBroksum(preset = 'ACCUM') {
+      if (preset === 'ACCUM') {
+        document.getElementById('v36-ticker').value = 'BBCA';
+        document.getElementById('v36-price').value = '9175';
+        document.getElementById('v36-text-input').value =
+`ZP 195,000 178.4B 9,150 | YP 142,800 130.9B 9,170
+AK 138,500 126.9B 9,160 | XL 118,500 108.7B 9,175
+BK 92,000  84.3B  9,165 | XC 84,200  77.2B  9,170
+KZ 64,000  58.7B  9,170 | PD 61,900  56.8B  9,175
+CC 48,200  44.2B  9,175 | KK 49,500  45.4B  9,180`;
+        switchInputSubTab('text');
+        runV36TextAnalysis(true);
+        showToast('Sample Big Accumulation (BBCA) dimuat.', 'success');
+      } else {
+        document.getElementById('v36-ticker').value = 'GOTO';
+        document.getElementById('v36-price').value = '64';
+        document.getElementById('v36-text-input').value =
+`XL 420,000 2.7B 65 | ZP 510,000 3.3B 65
+XC 310,000 2.0B 65 | AK 385,000 2.5B 65
+PD 240,000 1.5B 64 | BK 275,000 1.8B 65
+YP 180,000 1.2B 65 | KZ 190,000 1.2B 65`;
+        switchInputSubTab('text');
+        runV36TextAnalysis(true);
+        showToast('Sample Distribusi ke Ritel (GOTO) dimuat.', 'warn');
+      }
+    }
+
+    /* =========================================================================
+       7. SUB-TAB B: OCR SCREENSHOT READER (TESSERACT.JS + CTRL+V)
+       ========================================================================= */
+    async function handleOcrFile(file) {
+      if (!file) return;
+      const thumb = document.getElementById('ocr-thumb');
+      const emptyLabel = document.getElementById('ocr-empty-label');
+      const statusText = document.getElementById('ocr-status-text');
+      const pctText = document.getElementById('ocr-pct-text');
+      const progBar = document.getElementById('ocr-progress-bar');
+
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        thumb.src = ev.target.result;
+        thumb.classList.remove('hidden');
+        emptyLabel.classList.add('hidden');
+
+        if (typeof Tesseract === 'undefined') {
+          statusText.textContent = 'Library OCR offline. Gunakan Paste Teks.';
+          showToast('Tesseract.js tidak tersedia offline.', 'error');
+          return;
+        }
+
+        try {
+          statusText.textContent = 'Memindai screenshot dengan Tesseract OCR...';
+          const result = await Tesseract.recognize(ev.target.result, 'eng', {
+            logger: m => {
+              if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+                const pct = Math.round(m.progress * 100);
+                pctText.textContent = `${pct}%`;
+                progBar.style.width = `${pct}%`;
+              }
+            }
+          });
+
+          const extractedText = (result?.data?.text || '').trim();
+          pctText.textContent = '100%';
+          progBar.style.width = '100%';
+          statusText.textContent = 'Ekstraksi selesai! Mengirim ke parser V36...';
+
+          document.getElementById('v36-text-input').value = extractedText;
+          switchInputSubTab('text');
+          runV36TextAnalysis();
+        } catch (err) {
+          statusText.textContent = 'Gagal membaca gambar OCR.';
+          showToast('Terjadi kesalahan saat memproses OCR screenshot.', 'error');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Global Ctrl+V clipboard image paste support
+    window.addEventListener('paste', (e) => {
+      if (whaleState.activeTab !== 'radar') return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const blob = items[i].getAsFile();
+          switchInputSubTab('ocr');
+          handleOcrFile(blob);
+          break;
+        }
+      }
+    });
+
+    // Drag & Drop support on OCR zone
+    const dropZone = document.getElementById('ocr-dropzone');
+    if (dropZone) {
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-cyan-400', 'bg-[#131c31]');
+      });
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-cyan-400', 'bg-[#131c31]');
+      });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-cyan-400', 'bg-[#131c31]');
+        if (e.dataTransfer?.files?.[0]) {
+          handleOcrFile(e.dataTransfer.files[0]);
+        }
+      });
+    }
+
+    /* =========================================================================
+       8. SUB-TAB C: STOCKBIT JSON BRIDGE & CHROME EXTENSION AUTO-RECEIVER
+       ========================================================================= */
+    const CHROME_EXT_MANIFEST_SOURCE = `{
+  "manifest_version": 3,
+  "name": "Whale X-Ray V36 — Stockbit Broksum Bridge",
+  "version": "1.0.0",
+  "description": "Tarik data Broker Summary Stockbit Web langsung ke Whale X-Ray V36.",
+  "permissions": ["clipboardWrite"],
+  "content_scripts": [
+    {
+      "matches": ["https://stockbit.com/*", "https://*.stockbit.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}`;
+
+    const CHROME_EXT_CONTENT_SOURCE = `(() => {
+  // Ganti URL di bawah dengan URL GitHub Pages / lokal Whale X-Ray V36 Anda
+  const WHALE_XRAY_URL = "https://username.github.io/whale-xray/";
+
+  function parseCompactNum(str) {
+    if (!str) return 0;
+    let s = str.replace(/,/g, "").trim().toUpperCase();
+    let mult = 1;
+    if (s.endsWith("T")) { mult = 1e12; s = s.slice(0, -1); }
+    else if (s.endsWith("B")) { mult = 1e9; s = s.slice(0, -1); }
+    else if (s.endsWith("M")) { mult = 1e6; s = s.slice(0, -1); }
+    else if (s.endsWith("K")) { mult = 1e3; s = s.slice(0, -1); }
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n * mult;
+  }
+
+  function extractStockbitBroksum() {
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const tickerCandidate = (pathParts[pathParts.length - 1] || "BBCA").toUpperCase();
+    const ticker = /^[A-Z]{4}$/.test(tickerCandidate) ? tickerCandidate : "BBCA";
+
+    const priceEl = document.querySelector("[class*='price'], [data-testid*='price']");
+    const lastPrice = priceEl ? parseCompactNum(priceEl.textContent) : 0;
+
+    const brokerMap = new Map();
+    const rows = document.querySelectorAll("table tbody tr");
+    rows.forEach((tr) => {
+      const cells = Array.from(tr.querySelectorAll("td")).map((td) => td.innerText.trim());
+      // Format standar tabel Broksum Stockbit: [BuyBroker, B.Lot, B.Val, B.Avg, SellBroker, S.Lot, S.Val, S.Avg]
+      if (cells.length >= 8) {
+        const bCode = cells[0].toUpperCase();
+        const bLot = parseCompactNum(cells[1]);
+        const bAvg = parseCompactNum(cells[3]);
+        if (/^[A-Z]{2}$/.test(bCode) && bLot > 0) {
+          const cur = brokerMap.get(bCode) || { broker: bCode, buy_lot: 0, buy_avg: 0, sell_lot: 0, sell_avg: 0 };
+          cur.buy_lot += bLot;
+          cur.buy_avg = bAvg || cur.buy_avg;
+          brokerMap.set(bCode, cur);
+        }
+
+        const sCode = cells[4].toUpperCase();
+        const sLot = parseCompactNum(cells[5]);
+        const sAvg = parseCompactNum(cells[7]);
+        if (/^[A-Z]{2}$/.test(sCode) && sLot > 0) {
+          const cur = brokerMap.get(sCode) || { broker: sCode, buy_lot: 0, buy_avg: 0, sell_lot: 0, sell_avg: 0 };
+          cur.sell_lot += sLot;
+          cur.sell_avg = sAvg || cur.sell_avg;
+          brokerMap.set(sCode, cur);
+        }
+      }
+    });
+
+    return {
+      ticker,
+      last_price: lastPrice,
+      brokers: Array.from(brokerMap.values())
+    };
+  }
+
+  function injectFloatingButton() {
+    if (document.getElementById("wxray-bridge-btn")) return;
+    const btn = document.createElement("button");
+    btn.id = "wxray-bridge-btn";
+    btn.textContent = "⚡ Kirim ke Whale X-Ray";
+    Object.assign(btn.style, {
+      position: "fixed",
+      bottom: "20px",
+      right: "20px",
+      zIndex: "999999",
+      background: "#06b6d4",
+      color: "#060a12",
+      fontWeight: "800",
+      fontSize: "12px",
+      padding: "10px 16px",
+      borderRadius: "12px",
+      border: "none",
+      boxShadow: "0 8px 24px rgba(6,182,212,0.35)",
+      cursor: "pointer"
+    });
+
+    btn.onclick = async () => {
+      const payload = extractStockbitBroksum();
+      if (!payload.brokers.length) {
+        btn.textContent = "⚠️ Buka Tab Broker Summary Dulu";
+        setTimeout(() => (btn.textContent = "⚡ Kirim ke Whale X-Ray"), 2500);
+        return;
+      }
+      const jsonStr = JSON.stringify(payload);
+      try {
+        await navigator.clipboard.writeText(jsonStr);
+      } catch (e) {}
+      const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+      window.open(WHALE_XRAY_URL + "#xbridge=" + encoded, "_blank");
+      btn.textContent = "✅ Terkirim (" + payload.brokers.length + " Broker)";
+      setTimeout(() => (btn.textContent = "⚡ Kirim ke Whale X-Ray"), 2500);
+    };
+
+    document.body.appendChild(btn);
+  }
+
+  setInterval(injectFloatingButton, 2000);
+})();`;
+
+    function toggleExtensionKit() {
+      const drawer = document.getElementById('extension-kit-drawer');
+      const isHidden = drawer.classList.contains('hidden');
+      if (isHidden) {
+        document.getElementById('ext-code-manifest').textContent = CHROME_EXT_MANIFEST_SOURCE;
+        document.getElementById('ext-code-content').textContent = CHROME_EXT_CONTENT_SOURCE;
+        drawer.classList.remove('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    function copyExtensionFile(fileKey) {
+      const content = fileKey === 'manifest' ? CHROME_EXT_MANIFEST_SOURCE : CHROME_EXT_CONTENT_SOURCE;
+      const fileName = fileKey === 'manifest' ? 'manifest.json' : 'content.js';
+      const tempArea = document.createElement('textarea');
+      tempArea.value = content;
+      tempArea.style.position = 'fixed';
+      tempArea.style.opacity = '0';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+        showToast(`Kode ${fileName} berhasil disalin ke clipboard!`, 'success');
+      } catch (e) {
+        showToast(`Gagal menyalin ${fileName}.`, 'error');
+      }
+      document.body.removeChild(tempArea);
+    }
+
+    async function pasteJsonFromClipboard() {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const clipText = await navigator.clipboard.readText();
+          if (clipText && clipText.trim()) {
+            document.getElementById('v36-json-input').value = clipText.trim();
+            runV36JsonAnalysis();
+            return;
+          }
+        }
+        showToast('Clipboard kosong atau diblokir browser. Tekan Ctrl+V di kotak JSON.', 'warn');
+        document.getElementById('v36-json-input').focus();
+      } catch (err) {
+        showToast('Akses clipboard dibatasi iframe. Tempel manual dengan Ctrl+V.', 'warn');
+        document.getElementById('v36-json-input').focus();
+      }
+    }
+
+    function checkIncomingBridgePayload() {
+      // 1. Check URL Hash Bridge (#xbridge=base64)
+      const hash = window.location.hash || '';
+      if (hash.startsWith('#xbridge=')) {
+        try {
+          const rawB64 = decodeURIComponent(hash.slice('#xbridge='.length));
+          const decodedJson = decodeURIComponent(escape(atob(rawB64)));
+          document.getElementById('v36-json-input').value = decodedJson;
+          switchMainTab('radar');
+          switchInputSubTab('json');
+          runV36JsonAnalysis();
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          return true;
+        } catch (e) {
+          showToast('Payload URL Bridge dari ekstensi tidak valid.', 'error');
+        }
+      }
+      return false;
+    }
+
+    // 2. Listen to window.postMessage from Chrome Extension
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.source === 'WHALE_XRAY_EXT' && event.data.payload) {
+        const jsonStr = typeof event.data.payload === 'string'
+          ? event.data.payload
+          : JSON.stringify(event.data.payload, null, 2);
+        document.getElementById('v36-json-input').value = jsonStr;
+        switchMainTab('radar');
+        switchInputSubTab('json');
+        runV36JsonAnalysis();
+      }
+    });
+
+    function loadSampleJson() {
+      const sample = {
+        ticker: 'BBCA',
+        last_price: 9175,
+        brokers: [
+          { broker: 'ZP', buy_lot: 195000, buy_avg: 9150, sell_lot: 12000, sell_avg: 9170 },
+          { broker: 'AK', buy_lot: 138500, buy_avg: 9160, sell_lot: 8500,  sell_avg: 9175 },
+          { broker: 'BK', buy_lot: 92000,  buy_avg: 9165, sell_lot: 4000,  sell_avg: 9175 },
+          { broker: 'YP', buy_lot: 24000,  buy_avg: 9170, sell_lot: 166800, sell_avg: 9170 },
+          { broker: 'XL', buy_lot: 15000,  buy_avg: 9175, sell_lot: 133500, sell_avg: 9175 },
+          { broker: 'XC', buy_lot: 11000,  buy_avg: 9175, sell_lot: 95200,  sell_avg: 9170 }
+        ]
+      };
+      document.getElementById('v36-json-input').value = JSON.stringify(sample, null, 2);
+    }
+
+    function runV36JsonAnalysis() {
+      const rawJson = document.getElementById('v36-json-input').value.trim();
+      if (!rawJson) {
+        showToast('Tempel JSON terlebih dahulu.', 'warn');
+        return;
+      }
+      try {
+        const parsedObj = JSON.parse(rawJson);
+
+        // Auto-sync Ticker & Last Price if provided by Chrome Extension payload
+        if (!Array.isArray(parsedObj)) {
+          if (parsedObj.ticker) {
+            document.getElementById('v36-ticker').value = String(parsedObj.ticker).toUpperCase().trim();
+          }
+          const incomingPrice = parseFloat(parsedObj.last_price || parsedObj.lastPrice || 0);
+          if (incomingPrice > 0) {
+            document.getElementById('v36-price').value = incomingPrice;
+          }
+          syncActiveTickerState();
+        }
+
+        const list = Array.isArray(parsedObj) ? parsedObj : (parsedObj.data || parsedObj.brokers || []);
+        if (!Array.isArray(list) || list.length === 0) {
+          showToast('Struktur JSON harus berupa array broker.', 'error');
+          return;
+        }
+
+        const records = list.map(item => {
+          const code = String(item.broker || item.broker_code || item.code || '').toUpperCase().trim();
+          const buyLot = parseFloat(item.buy_lot || item.buyLot || (item.net_lot > 0 ? item.net_lot : 0) || 0);
+          const buyAvg = parseFloat(item.buy_avg || item.buyAvg || item.avg || whaleState.lastPrice || 0);
+          const sellLot = parseFloat(item.sell_lot || item.sellLot || (item.net_lot < 0 ? Math.abs(item.net_lot) : 0) || 0);
+          const sellAvg = parseFloat(item.sell_avg || item.sellAvg || item.avg || whaleState.lastPrice || 0);
+          return {
+            code,
+            category: classifyBroker(code),
+            buyLot,
+            buyVal: buyLot * 100 * buyAvg,
+            sellLot,
+            sellVal: sellLot * 100 * sellAvg
+          };
+        }).filter(r => r.code.length === 2);
+
+        if (records.length === 0) {
+          showToast('Tidak ditemukan kode broker valid di JSON.', 'error');
+          return;
+        }
+
+        computeBandarmologyMetrics(records);
+        showToast(`JSON Bridge berhasil memproses ${records.length} broker (${whaleState.ticker}).`, 'success');
+      } catch (err) {
+        showToast('Format JSON tidak valid. Periksa tanda kurung/koma.', 'error');
+      }
+    }
+
+    /* =========================================================================
+       9. GOOGLE SHEETS JOURNAL EXPORT (CLIPBOARD & CSV)
+       ========================================================================= */
+    function buildJournalRowData() {
+      const s = whaleState.latestScan;
+      const dateStr = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' });
+      if (!s) {
+        return [dateStr, whaleState.ticker, whaleState.lastPrice, whaleState.strategyMode, 0, 'N/A', 0, 0, '--', 0];
+      }
+      return [
+        dateStr,
+        s.ticker,
+        s.lastPrice,
+        s.strategyMode,
+        s.bandarScore,
+        s.regimeLabel,
+        s.hhi,
+        Math.round(s.netInstLot),
+        s.controllerCode,
+        s.controllerVwap
+      ];
+    }
+
+    function copyJournalRow() {
+      const tsvRow = buildJournalRowData().join('\t');
+      const tempArea = document.createElement('textarea');
+      tempArea.value = tsvRow;
+      tempArea.style.position = 'fixed';
+      tempArea.style.opacity = '0';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Baris jurnal disalin! Siap paste (Ctrl+V) ke Google Sheets.', 'success');
+      } catch (e) {
+        showToast('Gagal menyalin ke clipboard.', 'error');
+      }
+      document.body.removeChild(tempArea);
+    }
+
+    function downloadJournalCsv() {
+      const headers = ['Tanggal', 'Ticker', 'Last_Price', 'Strategy_Mode', 'Skor_Bandar', 'Regime', 'HHI', 'Net_Inst_Lot', 'Sopir_Utama', 'Bandar_VWAP'];
+      const row = buildJournalRowData();
+      const csvContent = `${headers.join(',')}\n${row.join(',')}\n`;
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `WhaleXRay_V36_${whaleState.ticker}_${Date.now()}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('File CSV jurnal berhasil diunduh.', 'success');
+    }
+
+    /* =========================================================================
+       10. TAB 2: 🧮 BANDAR PAIN & MARK-UP LOGIC
+       ========================================================================= */
+    function syncRadarToPain() {
+      const s = whaleState.latestScan;
+      document.getElementById('pain-ticker').value = s ? s.ticker : whaleState.ticker;
+      document.getElementById('pain-last').value = s ? s.lastPrice : whaleState.lastPrice;
+      if (s && s.controllerCode !== '--') {
+        document.getElementById('pain-driver').value = s.controllerCode;
+        document.getElementById('pain-vwap').value = s.controllerVwap;
+        document.getElementById('pain-lot').value = Math.round(s.controllerLot);
+      }
+      calculateBandarPain();
+      showToast('Data Sopir Utama & VWAP ditarik dari Radar V36.', 'success');
+    }
+
+    function calculateBandarPain() {
+      const ticker = (document.getElementById('pain-ticker').value || 'BBCA').toUpperCase();
+      const driver = (document.getElementById('pain-driver').value || 'ZP').toUpperCase();
+      const vwap = parseFloat(document.getElementById('pain-vwap').value) || 0;
+      const last = parseFloat(document.getElementById('pain-last').value) || 0;
+      const lot = parseFloat(document.getElementById('pain-lot').value) || 0;
+
+      document.getElementById('pain-ladder-ticker').textContent = `IDX: ${ticker} • Sopir: ${driver}`;
+
+      const floatPct = vwap > 0 ? ((last - vwap) / vwap) * 100 : 0;
+      const floatRp = (last - vwap) * lot * 100;
+
+      const pctEl = document.getElementById('pain-float-pct');
+      const rpEl = document.getElementById('pain-float-rp');
+      const noteEl = document.getElementById('pain-regime-note');
+
+      pctEl.textContent = `${floatPct >= 0 ? '+' : ''}${floatPct.toFixed(2)}%`;
+      pctEl.className = `font-mono font-extrabold text-base tabular-nums ${floatPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      rpEl.textContent = `${floatRp >= 0 ? '+' : '-'}${formatRupiah(Math.abs(floatRp))}`;
+
+      if (floatPct >= 8) {
+        noteEl.textContent = 'Status: Bandar dalam zona mark-up profit — waspadai distribusi bertahap.';
+        noteEl.className = 'pt-1 border-t border-[#1e293b] text-[11px] font-mono text-amber-400';
+      } else if (floatPct >= 0) {
+        noteEl.textContent = 'Status: Bandar berada di atas modal rata-rata (Zona Kontrol Aman).';
+        noteEl.className = 'pt-1 border-t border-[#1e293b] text-[11px] font-mono text-emerald-400';
+      } else if (floatPct > -5) {
+        noteEl.textContent = 'Status: Harga sedikit di bawah VWAP bandar — area re-akumulasi / penjagaan.';
+        noteEl.className = 'pt-1 border-t border-[#1e293b] text-[11px] font-mono text-cyan-300';
+      } else {
+        noteEl.textContent = 'Status: Zona Bandar Pain! Risiko cut-loss paksa / capitulation meningkat.';
+        noteEl.className = 'pt-1 border-t border-[#1e293b] text-[11px] font-mono text-rose-400';
+      }
+
+      const levels = [
+        { label: 'Euphoria Distribution (+25%)', pct: '+25%', price: roundNearestIdxTick(vwap * 1.25), tone: 'emerald', desc: 'Target distribusi akhir' },
+        { label: 'Base Mark-Up Target (+15%)',   pct: '+15%', price: roundNearestIdxTick(vwap * 1.15), tone: 'emerald', desc: 'Target utama gelombang naik' },
+        { label: 'Conservative Target (+8%)',    pct: '+8%',  price: roundNearestIdxTick(vwap * 1.08), tone: 'cyan',    desc: 'Take profit parsial pertama' },
+        { label: `BANDAR VWAP (${driver})`,      pct: '0%',   price: Math.round(vwap),                 tone: 'amber',   desc: 'Modal rata-rata pengendali' },
+        { label: 'Minor Pain Floor (-5%)',       pct: '-5%',  price: roundNearestIdxTick(vwap * 0.95), tone: 'rose',    desc: 'Batas toleransi koreksi wajar' },
+        { label: 'Capitulation Warning (-8%)',   pct: '-8%',  price: roundNearestIdxTick(vwap * 0.92), tone: 'rose',    desc: 'Tekanan margin & stop loss' },
+        { label: 'Hard Cut-Loss Floor (-12%)',   pct: '-12%', price: roundNearestIdxTick(vwap * 0.88), tone: 'rose',    desc: 'Batas likuidasi posisi bandar' }
+      ];
+
+      const badgeStyles = {
+        emerald: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35',
+        cyan:    'bg-cyan-500/15 text-cyan-300 border-cyan-500/35',
+        amber:   'bg-amber-500/20 text-amber-300 border-amber-500/50',
+        rose:    'bg-rose-500/15 text-rose-300 border-rose-500/35'
+      };
+
+      const container = document.getElementById('pain-ladder-container');
+      container.innerHTML = levels.map(lv => {
+        const isCurrentNear = vwap > 0 && Math.abs(last - lv.price) / vwap <= 0.015;
+        return `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-[#060a12] border ${isCurrentNear ? 'border-cyan-400 ring-1 ring-cyan-400/30' : 'border-[#1e293b]'}">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${badgeStyles[lv.tone]}">${lv.pct}</span>
+                <span class="text-xs font-bold text-slate-200">${lv.label}</span>
+                ${isCurrentNear ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500 text-slate-950 font-extrabold">LAST PRICE</span>' : ''}
+              </div>
+              <div class="text-[11px] text-slate-500 font-sans mt-0.5">${lv.desc}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm sm:text-base font-extrabold text-white">${formatRupiah(lv.price)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* =========================================================================
+       11. TAB 3: ⚖️ RDN POSITION SIZER (WITH 35% MAX ALLOCATION GUARDRAIL)
+       ========================================================================= */
+    function syncRadarToSizer() {
+      const entry = whaleState.latestScan ? whaleState.latestScan.lastPrice : whaleState.lastPrice;
+      if (entry > 0) {
+        document.getElementById('sizer-entry').value = entry;
+        document.getElementById('sizer-sl').value = roundNearestIdxTick(entry * 0.965);
+        document.getElementById('sizer-tp').value = roundNearestIdxTick(entry * 1.08);
+        calculatePositionSize();
+        showToast(`Entry Price disinkronkan ke ${formatRupiah(entry)}.`, 'success');
+      }
+    }
+
+    function calculatePositionSize() {
+      const rdn = parseFloat(document.getElementById('sizer-rdn').value) || 0;
+      const riskPct = parseFloat(document.getElementById('sizer-risk-pct').value) || 0;
+      const entry = parseFloat(document.getElementById('sizer-entry').value) || 0;
+      const sl = parseFloat(document.getElementById('sizer-sl').value) || 0;
+      const tp = parseFloat(document.getElementById('sizer-tp').value) || 0;
+      const feeBuy = (parseFloat(document.getElementById('sizer-fee-buy').value) || 0) / 100;
+      const feeSell = (parseFloat(document.getElementById('sizer-fee-sell').value) || 0) / 100;
+
+      if (rdn <= 0 || entry <= 0 || sl <= 0 || entry <= sl) {
+        document.getElementById('sizer-res-lot').textContent = '0 Lot';
+        document.getElementById('sizer-res-shares').textContent = 'Stop Loss harus < Entry';
+        return;
+      }
+
+      const maxRiskBudget = rdn * (riskPct / 100);
+      // Net loss per share including buy fee & sell fee on SL execution
+      const effectiveBuyPerShare = entry * (1 + feeBuy);
+      const effectiveSlProceedsPerShare = sl * (1 - feeSell);
+      const riskPerShare = Math.max(1, effectiveBuyPerShare - effectiveSlProceedsPerShare);
+
+      const riskBasedShares = Math.floor(maxRiskBudget / riskPerShare);
+      const riskBasedLots = Math.floor(riskBasedShares / 100);
+
+      // Enforce 35% Max Allocation per Ticker Guardrail
+      const maxCapitalAllowed = rdn * 0.35;
+      const maxCapLots = Math.floor(maxCapitalAllowed / (effectiveBuyPerShare * 100));
+
+      const isCapped = riskBasedLots > maxCapLots;
+      const finalLots = Math.max(0, Math.min(riskBasedLots, maxCapLots));
+      const finalShares = finalLots * 100;
+
+      const totalBuyVal = finalShares * effectiveBuyPerShare;
+      const rdnUsedPct = rdn > 0 ? (totalBuyVal / rdn) * 100 : 0;
+
+      const netRiskRp = finalShares * riskPerShare;
+      const effectiveTpProceedsPerShare = tp * (1 - feeSell);
+      const netRewardRp = Math.max(0, finalShares * (effectiveTpProceedsPerShare - effectiveBuyPerShare));
+      const rrRatio = netRiskRp > 0 ? netRewardRp / netRiskRp : 0;
+
+      document.getElementById('sizer-res-lot').textContent = `${finalLots.toLocaleString('id-ID')} Lot`;
+      document.getElementById('sizer-res-shares').textContent = `${finalShares.toLocaleString('id-ID')} Lembar`;
+      document.getElementById('sizer-res-buyval').textContent = formatRupiah(totalBuyVal);
+      document.getElementById('sizer-res-rdn-pct').textContent = `${rdnUsedPct.toFixed(2)}%`;
+      document.getElementById('sizer-rdn-bar').style.width = `${Math.min(100, (rdnUsedPct / 35) * 100)}%`;
+
+      document.getElementById('sizer-res-risk-rp').textContent = `-${formatRupiah(netRiskRp)}`;
+      document.getElementById('sizer-res-reward-rp').textContent = `+${formatRupiah(netRewardRp)}`;
+      document.getElementById('sizer-res-rr').textContent = `1 : ${rrRatio.toFixed(2)}`;
+
+      const rrLabelEl = document.getElementById('sizer-res-rr-label');
+      if (rrRatio >= 2) {
+        rrLabelEl.textContent = 'Optimal Risk-to-Reward (≥ 1:2)';
+        rrLabelEl.className = 'text-[11px] font-mono text-emerald-400 mt-0.5';
+      } else if (rrRatio >= 1.5) {
+        rrLabelEl.textContent = 'Acceptable Setup (≥ 1:1.5)';
+        rrLabelEl.className = 'text-[11px] font-mono text-cyan-300 mt-0.5';
+      } else {
+        rrLabelEl.textContent = 'Low R:R (< 1:1.5 — Evaluasi Target)';
+        rrLabelEl.className = 'text-[11px] font-mono text-amber-400 mt-0.5';
+      }
+
+      const capBadge = document.getElementById('sizer-cap-badge');
+      if (isCapped) {
+        capBadge.textContent = '⚠️ Dibatasi Guardrail Maks 35% RDN';
+        capBadge.className = 'px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/40';
+      } else {
+        capBadge.textContent = 'Guardrail 35% Aman';
+        capBadge.className = 'px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35';
+      }
+    }
+
+    /* =========================================================================
+       12. TAB 4: 📡 BATCH BSJP RADAR
+       ========================================================================= */
+    function renderBatchTable() {
+      const sortBy = document.getElementById('batch-sort-select').value;
+      const list = [...whaleState.batchList];
+
+      list.sort((a, b) => {
+        if (sortBy === 'ticker') return a.ticker.localeCompare(b.ticker);
+        return (b[sortBy] || 0) - (a[sortBy] || 0);
+      });
+
+      const tbody = document.getElementById('batch-tbody');
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-slate-500">Watchlist BSJP kosong</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((item, idx) => {
+        const scoreColor = item.score >= 80 ? 'text-emerald-400' : (item.score >= 65 ? 'text-cyan-300' : 'text-amber-400');
+        return `
+          <tr class="hover:bg-[#131c31]/65 transition">
+            <td class="py-3 pr-3 font-bold text-slate-500">#${idx + 1}</td>
+            <td class="py-3 px-3 font-extrabold text-white text-sm">${item.ticker}</td>
+            <td class="py-3 px-3 text-right text-slate-200">${formatRupiah(item.lastPrice)}</td>
+            <td class="py-3 px-3 text-center">
+              <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold">${item.driver}</span>
+            </td>
+            <td class="py-3 px-3 text-right text-amber-400">${formatRupiah(item.avg)}</td>
+            <td class="py-3 px-3 text-right text-emerald-400 font-bold">+${item.instLot.toLocaleString('id-ID')}</td>
+            <td class="py-3 px-3 text-right text-slate-300">${item.hhi.toLocaleString('id-ID')}</td>
+            <td class="py-3 px-3 text-right font-extrabold text-sm ${scoreColor}">${item.score}</td>
+            <td class="py-3 pl-3 text-right">
+              <div class="inline-flex items-center gap-1.5">
+                <button type="button" onclick="openBatchTickerInRadar('${item.ticker}')"
+                  class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 transition">
+                  Buka di Radar V36 →
+                </button>
+                <button type="button" onclick="removeBatchTicker('${item.ticker}')" title="Hapus"
+                  class="px-2 py-1.5 rounded-lg text-[11px] text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition">
+                  ✕
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function addBatchTicker() {
+      const ticker = (document.getElementById('batch-in-ticker').value || '').toUpperCase().trim();
+      const lastPrice = parseFloat(document.getElementById('batch-in-price').value) || 0;
+      const driver = (document.getElementById('batch-in-driver').value || 'ZP').toUpperCase().trim();
+      const avg = parseFloat(document.getElementById('batch-in-avg').value) || lastPrice;
+      const instLot = parseFloat(document.getElementById('batch-in-lot').value) || 0;
+      const hhi = parseFloat(document.getElementById('batch-in-hhi').value) || 1800;
+      const score = Math.max(0, Math.min(100, parseFloat(document.getElementById('batch-in-score').value) || 75));
+
+      if (!ticker || lastPrice <= 0) {
+        showToast('Isi minimal Ticker dan Last Price yang valid.', 'warn');
+        return;
+      }
+
+      whaleState.batchList = whaleState.batchList.filter(x => x.ticker !== ticker);
+      whaleState.batchList.push({ ticker, lastPrice, driver, avg, instLot, hhi, score });
+
+      ['batch-in-ticker', 'batch-in-price', 'batch-in-driver', 'batch-in-avg', 'batch-in-lot', 'batch-in-hhi', 'batch-in-score'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+
+      renderBatchTable();
+      showToast(`${ticker} ditambahkan ke Batch BSJP Radar.`, 'success');
+    }
+
+    function removeBatchTicker(ticker) {
+      whaleState.batchList = whaleState.batchList.filter(x => x.ticker !== ticker);
+      renderBatchTable();
+    }
+
+    function openBatchTickerInRadar(ticker) {
+      const found = whaleState.batchList.find(x => x.ticker === ticker);
+      if (!found) return;
+
+      document.getElementById('v36-ticker').value = found.ticker;
+      document.getElementById('v36-price').value = found.lastPrice;
+      setStrategyMode('Intraday / BSJP');
+
+      // Generate realistic synthetic broker summary rows matching the batch metrics so Radar V36 populates cleanly
+      const driverLot = Math.round(found.instLot * 0.62);
+      const coDriverLot = Math.round(found.instLot * 0.38);
+      const retailSell1 = Math.round(found.instLot * 0.55);
+      const retailSell2 = Math.round(found.instLot * 0.45);
+
+      document.getElementById('v36-text-input').value =
+`${found.driver} ${driverLot.toLocaleString('en-US')} ${(driverLot * 100 * found.avg / 1e9).toFixed(2)}B ${found.avg} | YP ${retailSell1.toLocaleString('en-US')} ${(retailSell1 * 100 * found.lastPrice / 1e9).toFixed(2)}B ${found.lastPrice}
+AK ${coDriverLot.toLocaleString('en-US')} ${(coDriverLot * 100 * found.avg / 1e9).toFixed(2)}B ${found.avg} | XL ${retailSell2.toLocaleString('en-US')} ${(retailSell2 * 100 * found.lastPrice / 1e9).toFixed(2)}B ${found.lastPrice}`;
+
+      switchMainTab('radar');
+      switchInputSubTab('text');
+      runV36TextAnalysis(true);
+      showToast(`Emiten ${found.ticker} dimuat di Radar Utama V36.`, 'success');
+    }
+
+    /* =========================================================================
+       13. TAB 5: 📊 AVERAGE & BEP CALCULATOR (EXACT LOGIC + RADAR V36 SYNC)
+       ========================================================================= */
+    function updateBepBenchmarkBanner() {
+      const s = whaleState.latestScan;
+      document.getElementById('bep-sync-ticker-pill').textContent = `Active: ${whaleState.ticker}`;
+      if (s && s.controllerCode !== '--' && s.controllerVwap > 0) {
+        document.getElementById('bep-bench-driver').textContent = `${s.controllerCode} (${s.ticker})`;
+        document.getElementById('bep-bench-vwap').textContent = formatRupiah(s.controllerVwap);
+      } else {
+        document.getElementById('bep-bench-driver').textContent = whaleState.ticker;
+        document.getElementById('bep-bench-vwap').textContent = formatRupiah(whaleState.lastPrice);
+      }
+    }
+
+    function syncRadarToBep() {
+      const s = whaleState.latestScan;
+      const targetPrice = s ? s.lastPrice : whaleState.lastPrice;
+      if (targetPrice > 0) {
+        document.getElementById('bep-new-price').value = targetPrice;
+      }
+      updateBepBenchmarkBanner();
+      calculateBepAvg();
+      showToast(`Harga Beli Baru diisi dengan Last Price ${whaleState.ticker} (${formatRupiah(targetPrice)}).`, 'success');
+    }
+
+    function resetBepCalculator() {
+      document.getElementById('bep-old-avg').value = '';
+      document.getElementById('bep-old-lot').value = '';
+      document.getElementById('bep-new-price').value = '';
+      document.getElementById('bep-new-lot').value = '';
+      document.getElementById('bep-fee-beli').value = '0.15';
+      document.getElementById('bep-fee-jual').value = '0.25';
+      calculateBepAvg();
+      showToast('Kalkulator Average & BEP di-reset.', 'info');
+    }
+
+    function calculateBepAvg(isManualButtonClick = false) {
+      const oldAvg   = parseFloat(document.getElementById('bep-old-avg').value) || 0;
+      const oldLot   = parseFloat(document.getElementById('bep-old-lot').value) || 0;
+      const newPrice = parseFloat(document.getElementById('bep-new-price').value) || 0;
+      const newLot   = parseFloat(document.getElementById('bep-new-lot').value) || 0;
+      const feeBeli  = parseFloat(document.getElementById('bep-fee-beli').value) || 0;
+      const feeJual  = parseFloat(document.getElementById('bep-fee-jual').value) || 0;
+
+      const actionBadge = document.getElementById('bep-action-badge');
+
+      // Strategy Detection Badge
+      if (newPrice < oldAvg && newPrice > 0 && oldLot > 0 && newLot > 0) {
+        actionBadge.textContent = '↓ AVERAGE DOWN';
+        actionBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-extrabold bg-rose-500/15 text-rose-300 border border-rose-500/40';
+      } else if (newPrice > oldAvg && oldAvg > 0 && oldLot > 0 && newLot > 0) {
+        actionBadge.textContent = '↑ AVERAGE UP';
+        actionBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40';
+      } else {
+        actionBadge.textContent = 'POSISI BARU / NETRAL';
+        actionBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-extrabold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35';
+      }
+
+      if (oldLot === 0 && newLot === 0) {
+        document.getElementById('bep-res-total-lot').textContent = '0 Lot';
+        document.getElementById('bep-res-fund-needed').textContent = 'Rp 0';
+        document.getElementById('bep-res-total-modal').textContent = 'Rp 0';
+        document.getElementById('bep-res-new-avg').textContent = 'Rp 0';
+        document.getElementById('bep-res-bep-price').textContent = 'Rp 0';
+        document.getElementById('bep-res-idx-tick').textContent = 'Rp 0';
+        document.getElementById('bep-res-float-before').textContent = '0.00%';
+        document.getElementById('bep-res-float-before').className = 'text-slate-200';
+        document.getElementById('bep-res-float-after').textContent = '0.00%';
+        document.getElementById('bep-res-float-after').className = 'text-slate-200';
+        if (isManualButtonClick) {
+          showToast('Masukkan jumlah lot terlebih dahulu.', 'warn');
+        }
+        return;
+      }
+
+      // Exact Calculation Formulas from Kalkulator_Average_BEP.html
+      const modalLama = oldAvg * oldLot * 100;
+      const danaBeliKotor = newPrice * newLot * 100;
+      const modalBaru = danaBeliKotor + (danaBeliKotor * (feeBeli / 100));
+
+      const totalModal = modalLama + modalBaru;
+      const totalLot = oldLot + newLot;
+
+      const newAvg = totalLot > 0 ? totalModal / (totalLot * 100) : 0;
+
+      const divisorBEP = (totalLot * 100) * (1 - (feeJual / 100));
+      const bepPrice = divisorBEP > 0 ? totalModal / divisorBEP : 0;
+      const bepCeil = Math.ceil(bepPrice);
+      const validIdxTickBep = roundUpToIdxTick(bepPrice);
+
+      let floatBefore = 0;
+      let floatAfter = 0;
+      if (oldAvg > 0 && newPrice > 0) {
+        floatBefore = ((newPrice - oldAvg) / oldAvg) * 100;
+      }
+      if (newAvg > 0 && newPrice > 0) {
+        floatAfter = ((newPrice - newAvg) / newAvg) * 100;
+      }
+
+      function applyPctStyle(val, elId) {
+        const el = document.getElementById(elId);
+        if (val > 0) {
+          el.textContent = `+${val.toFixed(2)}%`;
+          el.className = 'text-emerald-400 font-bold';
+        } else if (val < 0) {
+          el.textContent = `${val.toFixed(2)}%`;
+          el.className = 'text-rose-400 font-bold';
+        } else {
+          el.textContent = '0.00%';
+          el.className = 'text-slate-200 font-bold';
+        }
+      }
+
+      document.getElementById('bep-res-total-lot').textContent = `${totalLot.toLocaleString('id-ID')} Lot`;
+      document.getElementById('bep-res-fund-needed').textContent = formatRupiah(modalBaru);
+      document.getElementById('bep-res-total-modal').textContent = formatRupiah(totalModal);
+      document.getElementById('bep-res-new-avg').textContent = formatRupiah(newAvg);
+      document.getElementById('bep-res-bep-price').textContent = `Rp ${bepCeil.toLocaleString('id-ID')}`;
+      document.getElementById('bep-res-idx-tick').textContent = `Rp ${validIdxTickBep.toLocaleString('id-ID')}`;
+
+      applyPctStyle(floatBefore, 'bep-res-float-before');
+      applyPctStyle(floatAfter, 'bep-res-float-after');
+
+      // Compare user's BEP against Sopir Utama VWAP from Radar V36
+      const s = whaleState.latestScan;
+      const benchMsg = document.getElementById('bep-bench-msg');
+      if (s && s.controllerVwap > 0 && bepCeil > 0) {
+        const diffPct = ((bepCeil - s.controllerVwap) / s.controllerVwap) * 100;
+        if (bepCeil <= s.controllerVwap) {
+          benchMsg.innerHTML = `<span class="text-emerald-400 font-semibold">BEP Anda (${formatRupiah(bepCeil)}) berada ${Math.abs(diffPct).toFixed(2)}% DI BAWAH modal bandar</span> — Margin of safety kuat!`;
+        } else {
+          benchMsg.innerHTML = `<span class="text-amber-400 font-semibold">BEP Anda (${formatRupiah(bepCeil)}) berada +${diffPct.toFixed(2)}% DI ATAS modal bandar</span> — Perhatikan disiplin stop loss.`;
+        }
+      }
+    }
+
+    /* =========================================================================
+       14. WINDOW ONLOAD INITIALIZATION
+       ========================================================================= */
+    window.onload = function () {
+      updateJakartaMarketClock();
+      setInterval(updateJakartaMarketClock, 1000);
+
+      // Check if opened via Chrome Extension URL Bridge (#xbridge=...)
+      const receivedFromExt = checkIncomingBridgePayload();
+
+      if (!receivedFromExt) {
+        // Populate default V36 core radar view with realistic sample data on load
+        document.getElementById('v36-text-input').value =
+`ZP 195,000 178.4B 9,150 | YP 142,800 130.9B 9,170
+AK 138,500 126.9B 9,160 | XL 118,500 108.7B 9,175
+BK 92,000  84.3B  9,165 | XC 84,200  77.2B  9,170
+KZ 64,000  58.7B  9,170 | PD 61,900  56.8B  9,175
+CC 48,200  44.2B  9,175 | KK 49,500  45.4B  9,180`;
+        runV36TextAnalysis(true);
+      }
+
+      // Initialize secondary modules so they are ready immediately when clicked
+      calculateBandarPain();
+      calculatePositionSize();
+      renderBatchTable();
+
+      // Pre-fill sample illustrative numbers in Average & BEP so user sees live output immediately
+      document.getElementById('bep-old-avg').value = '9500';
+      document.getElementById('bep-old-lot').value = '50';
+      document.getElementById('bep-new-price').value = '9175';
+      document.getElementById('bep-new-lot').value = '100';
+      calculateBepAvg();
+    };
+  </script>
+</body>
+</html>
