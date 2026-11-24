@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhaleX-Ray V37.1 Pro Quant: Bandar Mark-Up Calculator, Asymmetric RDN Sizer & Batch Tab Sniper</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.15);
+            --foreign: #c084fc;
+            --foreign-bg: rgba(192, 132, 252, 0.15);
+            --border: #334155;
+            --info: #0ea5e9;
+            --info-bg: rgba(14, 165, 233, 0.1);
+        }
+        body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 2rem; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 1350px; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--text-main); margin-bottom: 0.2rem; letter-spacing: 1px; }
+        p.subtitle { color: var(--text-muted); margin-top: 0; font-size: 0.95rem; }
+        .card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 2rem; border: 1px solid var(--border); }
+        label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem; font-weight: bold; }
+        .textarea-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .textarea-box { display: flex; flex-direction: column; }
+        .textarea-box label { color: var(--primary); }
+        .textarea-box.sell label { color: var(--danger); }
+        textarea { width: 100%; height: 140px; background-color: #0f172a; color: var(--text-main); border: 1px dashed var(--border); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.85rem; box-sizing: border-box; resize: vertical; }
+        .textarea-box.buy textarea { border-color: rgba(16, 185, 129, 0.5); }
+        .textarea-box.sell textarea { border-color: rgba(239, 68, 68, 0.5); }
+        textarea:focus { outline: none; border-style: solid; }
+        .settings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem; background-color: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); }
+        @media (max-width: 1100px) { .settings-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 650px) { .settings-grid { grid-template-columns: repeat(2, 1fr); } }
+        .input-group { display: flex; flex-direction: column; position: relative; }
+        .input-group input { background-color: var(--card-bg); color: white; border: 1px solid var(--border); padding: 0.75rem; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+        .input-group input.ticker-input { text-transform: uppercase; font-weight: bold; letter-spacing: 1px; color: var(--info); border-color: var(--info); }
+        .input-group span.help-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; line-height: 1.2; }
+        
+        .price-input-row { display: flex; gap: 4px; align-items: stretch; }
+        .btn-refresh-price {
+            background-color: var(--card-bg);
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .btn-refresh-price:hover {
+            border-color: var(--info);
+            background-color: var(--info-bg);
+        }
+
+        /* Custom Searchable Dropdown for 955 IDX Stocks */
+        .ticker-dropdown {
+            position: absolute;
+            top: 68px;
+            left: 0;
+            width: 280px;
+            max-height: 260px;
+            overflow-y: auto;
+            background-color: #1e293b;
+            border: 1px solid var(--info);
+            border-radius: 8px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.75);
+            z-index: 1000;
+            display: none;
+        }
+        .ticker-dropdown-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+            display: flex;
+            flex-direction: column;
+            transition: background 0.15s;
+        }
+        .ticker-dropdown-item:hover, .ticker-dropdown-item.active {
+            background-color: rgba(14, 165, 233, 0.2);
+        }
+        .ticker-code {
+            font-weight: 800;
+            color: var(--info);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        .ticker-name {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .live-status { font-size: 0.68rem; margin-top: 4px; font-weight: bold; line-height: 1.25; }
+        .status-fetching { color: var(--warning); }
+        .status-ok { color: var(--success); }
+        .status-fallback { color: var(--info); }
+        .btn-scan { width: 100%; padding: 1rem; background-color: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s; text-transform: uppercase; letter-spacing: 1px; margin-top: 1rem; }
+        .btn-scan:hover { background-color: var(--primary-hover); }
+        .btn-export { width: 100%; padding: 0.8rem; background-color: transparent; color: var(--info); border: 1px solid var(--info); border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.2s; margin-top: 1rem; }
+        .btn-export:hover { background-color: var(--info-bg); }
+        .result-header-banner { display: flex; justify-content: space-between; align-items: center; background-color: #0f172a; padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--info); }
+        .result-ticker-badge { font-size: 1.5rem; font-weight: 900; color: var(--info); letter-spacing: 2px; }
+        .result-company-sub { font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 2px; }
+        .result-price-badge { font-size: 1rem; color: var(--text-muted); font-family: monospace; }
+        .strategy-box { background-color: #0f172a; border-left: 4px solid var(--foreign); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .strategy-title { font-size: 1.1rem; font-weight: bold; color: var(--foreign); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .strategy-desc { font-size: 0.9rem; line-height: 1.5; color: var(--text-main); }
+        .signal-box { padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; border: 2px solid; }
+        .signal-action { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 2px; }
+        .signal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.8rem; opacity: 0.9; }
+        .signal-desc { font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.8rem; }
+        .dominance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .dom-card { background-color: #0f172a; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border); }
+        .dom-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .dom-title { font-size: 0.85rem; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
+        .dom-total { font-size: 0.8rem; color: var(--warning); font-family: monospace; }
+        .dom-stats { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .progress-bar-bg { width: 100%; height: 12px; background-color: var(--danger); border-radius: 6px; overflow: hidden; display: flex; }
+        .progress-bar-buy { height: 100%; background-color: var(--success); transition: width 0.4s ease; }
+        .dom-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; display: flex; justify-content: space-between; }
+        .summary-box { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1rem; background-color: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
+        .summary-item .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--warning); }
+        .summary-item .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+        .result-container { display: none; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; }
+        th, td { padding: 1rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+        th { background-color: #0f172a; color: var(--text-muted); font-weight: bold; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; }
+        .badge { display: inline-block; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 0.3rem; }
+        .badge.fake { background-color: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge.retail { background-color: var(--success-bg); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge.insti { background-color: var(--warning-bg); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge.asing { background-color: var(--foreign-bg); color: var(--foreign); border: 1px solid rgba(192, 132, 252, 0.3); }
+        .badge.unknown { background-color: #1e293b; color: var(--text-muted); border: 1px solid var(--border); }
+        .float-badge { font-size: 0.7rem; padding: 2px 4px; border-radius: 3px; margin-left: 5px; }
+        .float-cuan { background-color: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+        .float-loss { background-color: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+        .action-buyer { color: var(--success); font-weight: bold; }
+        .action-seller { color: var(--danger); font-weight: bold; }
+        .broker-tag { display: inline-block; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-top: 4px; font-weight: normal; }
+        .tag-ritel { background-color: #1e293b; color: var(--success); border: 1px solid var(--success); }
+        .tag-asing { background-color: #1e293b; color: var(--foreign); border: 1px solid var(--foreign); }
+        .tag-lokal { background-color: #1e293b; color: var(--warning); border: 1px solid var(--warning); }
+        .tag-mm { background-color: #1e293b; color: var(--danger); border: 1px solid var(--danger); }
+        .tag-unknown { background-color: #1e293b; color: var(--text-muted); border: 1px solid var(--border); }
+        .val-highlight { color: var(--warning); font-weight: bold; }
+        .narrative-text { display: block; font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-top: 4px; }
+        .broker-fullname { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; display:block; }
+    
+        .online-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; background: #0f172a; padding: 0.85rem 1.2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1rem; }
+        .online-badge-group { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .pill-btn { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        .pill-btn:hover { border-color: var(--info); color: var(--info); }
+        .pill-btn.active { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+        .ocr-zone { border: 1px dashed var(--info); background: rgba(14, 165, 233, 0.06); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem; }
+        .market-context-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--info); }
+        @media (max-width: 850px) { .market-context-grid { grid-template-columns: repeat(2, 1fr); } }
+        .mc-item { text-align: center; }
+        .mc-val { font-size: 1.05rem; font-weight: 800; color: var(--info); }
+        .mc-lbl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; }
+        .journal-history-card { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-top: 1.2rem; }
+        .webhook-row { display: flex; gap: 0.5rem; margin-top: 0.6rem; flex-wrap: wrap; }
+        .webhook-row input { flex: 1; min-width: 220px; background: var(--card-bg); color: #fff; border: 1px solid var(--border); padding: 0.55rem 0.8rem; border-radius: 6px; font-size: 0.8rem; }
+
+
+        /* V37.0 Pro Quant & Batch Sniper Styles */
+        .quant-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1rem; margin-bottom: 1.5rem; }
+        @media (max-width: 950px) { .quant-grid { grid-template-columns: 1fr; } }
+        .quant-card { background: #0f172a; border-radius: 10px; padding: 1.2rem; border: 1px solid var(--border); }
+        .quant-card.pain-card { border-color: rgba(56, 189, 248, 0.5); }
+        .quant-card.sizer-card { border-color: rgba(16, 185, 129, 0.5); }
+        .quant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; gap: 0.5rem; flex-wrap: wrap; }
+        .quant-title { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--info); }
+        .sizer-card .quant-title { color: var(--success); }
+        .zone-pill { font-size: 0.72rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; }
+        .levels-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-top: 0.8rem; }
+        @media (max-width: 650px) { .levels-grid { grid-template-columns: repeat(2, 1fr); } }
+        .level-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 7px; padding: 0.65rem 0.5rem; text-align: center; }
+        .level-lbl { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 3px; }
+        .level-val { font-size: 0.95rem; font-weight: 800; font-family: monospace; color: var(--text-main); }
+        .level-sub { font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 2px; }
+        .sizer-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-top: 0.8rem; }
+        .grade-banner { padding: 0.6rem 0.8rem; border-radius: 7px; font-weight: 800; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+        .batch-radar-card { background: var(--card-bg); border: 1px solid var(--info); border-radius: 12px; padding: 1.3rem; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.45); display: none; }
+        .batch-table th { background: #0f172a; font-size: 0.68rem; padding: 0.7rem 0.5rem; }
+        .batch-table td { padding: 0.7rem 0.5rem; font-size: 0.82rem; vertical-align: middle; }
+        .btn-mini { padding: 4px 8px; border-radius: 5px; border: 1px solid var(--info); background: var(--info-bg); color: var(--info); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+        .btn-mini:hover { background: var(--info); color: #0f172a; }
+        .tv-embed-box { display: none; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #0f172a; }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>WhaleX-Ray V37.1 <span style="font-size:0.5em; background:linear-gradient(90deg, #10b981, #38bdf8); color:#0f172a; padding:3px 10px; border-radius:6px; vertical-align:middle; font-weight:900;">PRO QUANT + BATCH SNIPER</span></h1>
+        <p class="subtitle">Bandar Pain & Mark-Up Calculator (IDX Tick Valid) • Asymmetric RDN Position Sizer • Multi-Tab BSJP Radar</p>
+    </div>
+    <div class="card">
+        
+        <div class="online-toolbar">
+            <div class="online-badge-group">
+                <span style="font-size:0.8rem; font-weight:bold; color:var(--success);">🌐 Mode Online Aktif</span>
+                <button type="button" class="pill-btn" id="btnAutoRefresh" onclick="toggleAutoRefresh()">⏱️ Live Auto-Refresh (30d): OFF</button>
+                <button type="button" class="pill-btn" onclick="openQuickChart()">📈 Buka Chart TradingView</button>
+            </div>
+            <div class="online-badge-group">
+                <span id="marketCapBadge" style="font-size:0.78rem; color:var(--text-muted); font-family:monospace;">Vol Pasar Live: - | OHLC: -</span>
+            </div>
+        </div>
+        <div class="ocr-zone" id="ocrZone">
+            <div>
+                <strong style="color:var(--info);">📸 Scan Screenshot Broksum (HP / PC):</strong>
+                <span style="color:var(--text-muted);">Tekan <code>Ctrl+V</code> gambar screenshot di mana saja atau pilih file gambar Stockbit/Ajaib untuk diekstrak otomatis.</span>
+                <div id="ocrStatus" style="font-size:0.75rem; color:var(--warning); margin-top:3px;"></div>
+            </div>
+            <div>
+                <input type="file" id="ocrFileInput" accept="image/*" style="display:none" onchange="handleOcrFile(this.files[0])">
+                <button type="button" class="pill-btn" onclick="document.getElementById('ocrFileInput').click()">📂 Upload Screenshot</button>
+            </div>
+        </div>
+
+        <div class="textarea-container">
+            <div class="textarea-box buy">
+                <label for="buyInput">🛒 Paste Top BUYERS</label>
+                <textarea id="buyInput" oninput="smartExtractFromPaste()" placeholder="Copy-Paste data BUY di sini... (Broker | B.Val | B.Lot | B.Freq | B.Avg)"></textarea>
+            </div>
+            <div class="textarea-box sell">
+                <label for="sellInput">🔴 Paste Top SELLERS</label>
+                <textarea id="sellInput" oninput="smartExtractFromPaste()" placeholder="Copy-Paste data SELL di sini... (Broker | S.Val | S.Lot | S.Freq | S.Avg)"></textarea>
+            </div>
+        </div>
+        <div class="settings-grid">
+            <div class="input-group" id="tickerContainer">
+                <label for="stockTicker" style="color: var(--info);">🏷️ Kode Saham (955 IDX)</label>
+                <input type="text" id="stockTicker" class="ticker-input" placeholder="Cari kode / nama..." autocomplete="off" onfocus="filterTickerDropdown()" oninput="onTickerInput()">
+                <div class="ticker-dropdown" id="tickerDropdown"></div>
+                <span class="help-text" id="selectedCompanyName">Semua saham BEI (AALI - ZYRX)</span>
+            </div>
+            <div class="input-group">
+                <label for="tradeDays" style="color: var(--primary);">⏳ Periode (Hari)</label>
+                <input type="number" id="tradeDays" value="1" min="1" oninput="autoUpdateThreshold()" style="border-color: var(--primary);">
+                <span class="help-text">1 = Intraday Engine<br>>1 = Swing Engine</span>
+            </div>
+            <div class="input-group">
+                <label for="priceChange" style="color: var(--warning);">📈 Price Change (%)</label>
+                <input type="number" id="priceChange" value="0" step="0.01" style="border-color: var(--warning);">
+                <span class="help-text">Auto-isi jika harga live aktif</span>
+            </div>
+            <div class="input-group">
+                <label for="avgPrice">Harga Saat Ini (Rp)</label>
+                <div class="price-input-row">
+                    <input type="number" id="avgPrice" value="755" min="1" oninput="onManualPriceChange()" onchange="onManualPriceChange()">
+                    <button type="button" class="btn-refresh-price" title="Coba tarik ulang harga live" onclick="manualRetryPrice()">🔄</button>
+                </div>
+                <span class="live-status" id="livePriceStatus">Auto-update batas aktif</span>
+            </div>
+            <div class="input-group">
+                <label for="thresholdValue">Batas Ritel (Rp)</label>
+                <input type="number" id="thresholdValue" value="5000000" min="100000" step="500000">
+                <span class="help-text" id="ritelHint">Auto-kalibrasi dari harga</span>
+            </div>
+            <div class="input-group">
+                <label for="whaleThreshold">Batas HAKA (Rp)</label>
+                <input type="number" id="whaleThreshold" value="50000000" min="1000000" step="1000000">
+                <span class="help-text" id="hakaHint">10x Batas Ritel (Auto)</span>
+            </div>
+            <div class="input-group">
+                <label for="rdnCapital" style="color: var(--success);">💰 Modal RDN Anda (Rp)</label>
+                <input type="number" id="rdnCapital" value="10000000" min="100000" step="500000" oninput="onRdnCapitalChange()">
+                <span class="help-text" id="rdnHint">Rp 10,00 Juta (Auto-simpan)</span>
+            </div>
+        </div>
+        <button id="scanBtn" class="btn-scan" onclick="scanData()" type="button">🔍 Eksekusi Analisis Institusi</button>
+    </div>
+
+    <div class="batch-radar-card" id="batchRadarCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.8rem;">
+            <div>
+                <h2 style="margin:0; font-size:1.15rem; color:var(--info);">🔥 BATCH BSJP RADAR — PAPAN PERINGKAT BANDAR</h2>
+                <span style="font-size:0.78rem; color:var(--text-muted);" id="batchRadarSummary">Diurutkan otomatis berdasarkan Grade Setup, Skor Bandar, & Net Cash Institusi</span>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button type="button" class="pill-btn" onclick="copyBatchSummary()">📋 Copy Ranking BSJP</button>
+                <button type="button" class="pill-btn" style="color:var(--danger);" onclick="clearBatchRadar()">🗑️ Tutup / Bersihkan</button>
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="batch-table" style="margin-top:0;">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Emiten & Harga</th>
+                        <th>Grade & Zona Bandar</th>
+                        <th>Skor / HHI</th>
+                        <th>Net Cash</th>
+                        <th>VWAP Bandar (Float)</th>
+                        <th>TP1 (+8%) / Cut Loss</th>
+                        <th>Alokasi RDN</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="batchRadarBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card result-container" id="resultCard">
+        <div class="result-header-banner">
+            <div>
+                <span style="font-size:0.75rem; color:var(--text-muted); display:block; text-transform:uppercase;">Laporan Bedah Bandar</span>
+                <span class="result-ticker-badge" id="bannerTicker">EMITEN: -</span>
+                <span class="result-company-sub" id="bannerCompany">-</span>
+            </div>
+            <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                <span class="result-price-badge" id="bannerMeta">Harga: Rp 0 | Periode: 1 Hari</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="pill-btn" onclick="toggleEmbeddedTvChart()">📊 Chart Live</button>
+                    <button type="button" class="pill-btn active" onclick="addCurrentToBatchRadar()">➕ Masukkan ke Radar BSJP</button>
+                </div>
+            </div>
+        </div>
+        <div class="tv-embed-box" id="tvEmbedBox"></div>
+        <div class="strategy-box" id="strategyBox">
+            <div class="strategy-title" id="strategyTitle">Mode Mesin: -</div>
+            <div class="strategy-desc" id="strategyDesc">-</div>
+        </div>
+        <div id="signalBox" class="signal-box">
+            <div id="signalAction" class="signal-action">MEMUAT...</div>
+            <div id="signalTitle" class="signal-title">Menganalisis Pola Institusi</div>
+            <div id="signalDesc" class="signal-desc">Deskripsi memuat...</div>
+            <div style="margin-top: 10px; font-family: monospace; color: var(--text-muted);">
+                <span id="signalScore">Skor Dominasi: 0</span> | 
+                <span id="driverStatus" style="color:var(--primary); font-weight:bold;">Pengendali: -</span>
+            </div>
+        </div>
+
+        
+
+        <div class="quant-grid">
+            <div class="quant-card pain-card">
+                <div class="quant-header">
+                    <span class="quant-title">🎯 Bandar Pain & Mark-Up Calculator (IDX Tick Valid)</span>
+                    <span class="zone-pill" id="bandarZonePill" style="background:var(--info-bg); color:var(--info);">MENGHITUNG...</span>
+                </div>
+                <div style="font-size:0.84rem; color:var(--text-main); line-height:1.45;" id="bandarPainNarrative">
+                    Menghitung rata-rata harga modal tertimbang (VWAP) dari broker pengendali utama...
+                </div>
+                <div class="levels-grid">
+                    <div class="level-box">
+                        <span class="level-lbl">VWAP Modal Bandar</span>
+                        <span class="level-val" id="lvlBandarVwap" style="color:var(--info);">Rp 0</span>
+                        <span class="level-sub" id="lvlFloatingSub">Floating: 0.0%</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Area Entry Ideal</span>
+                        <span class="level-val" id="lvlIdealEntry" style="color:var(--success);">Rp 0</span>
+                        <span class="level-sub">Rapat modal bandar</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Target Mark-Up (+8% / +15%)</span>
+                        <span class="level-val" id="lvlTargetMarkup" style="color:var(--warning);">Rp 0</span>
+                        <span class="level-sub" id="lvlTargetSub">TP2: Rp 0</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Hard Cut Loss (-3 Tick)</span>
+                        <span class="level-val" id="lvlHardCl" style="color:var(--danger);">Rp 0</span>
+                        <span class="level-sub" id="lvlClRiskSub">Risiko: 0.0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quant-card sizer-card">
+                <div class="quant-header">
+                    <span class="quant-title">⚖️ Asymmetric RDN Position Sizer</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;" id="sizerRdnLabel">RDN: Rp 10,00 Juta</span>
+                </div>
+                <div class="grade-banner" id="setupGradeBanner" style="background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning);">
+                    <span id="setupGradeTitle">GRADE C — CASH IS KING</span>
+                    <span id="setupAllocPct">0% RDN</span>
+                </div>
+                <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.4;" id="sizerRationale">
+                    Alokasi modal otomatis menyesuaikan kekuatan skor institusi dan jarak harga dari modal bandar.
+                </div>
+                <div class="sizer-metrics">
+                    <div class="level-box">
+                        <span class="level-lbl">Alokasi Rupiah</span>
+                        <span class="level-val" id="sizerAllocRp" style="color:var(--success);">Rp 0</span>
+                        <span class="level-sub">Modal posisi ini</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Jumlah Order (Lot)</span>
+                        <span class="level-val" id="sizerLots" style="color:var(--info);">0 Lot</span>
+                        <span class="level-sub" id="sizerLotPriceSub">@ Rp 0</span>
+                    </div>
+                    <div class="level-box">
+                        <span class="level-lbl">Maks. Risiko Cut Loss</span>
+                        <span class="level-val" id="sizerMaxLoss" style="color:var(--danger);">Rp 0</span>
+                        <span class="level-sub" id="sizerRdnRiskPct">0.00% dari RDN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <label>Konteks Pasar Live & Rasio Serapan Bandar (Online Data)</label>
+        <div class="market-context-grid" id="marketContextGrid">
+            <div class="mc-item"><div class="mc-val" id="mcDayRange">-</div><div class="mc-lbl">Rentang Harga Hari Ini (Low - High)</div></div>
+            <div class="mc-item"><div class="mc-val" id="mcMarketVol">-</div><div class="mc-lbl">Total Volume Pasar (Lot)</div></div>
+            <div class="mc-item"><div class="mc-val" id="mcMarketTurnover">-</div><div class="mc-lbl">Estimasi Turnover Pasar (Rp)</div></div>
+            <div class="mc-item"><div class="mc-val" id="mcBandarShare">-</div><div class="mc-lbl">Porsi Top Bandar vs Total Pasar</div></div>
+        </div>
+
+        <label>Dominasi Total Transaksi (Buy vs Sell Power)</label>
+        <div class="dominance-grid">
+            <div class="dom-card">
+                <div class="dom-header">
+                    <span class="dom-title">📊 Total Data yang Di-Paste</span>
+                    <span class="dom-total" id="allTotalVal">Total: Rp 0</span>
+                </div>
+                <div class="dom-stats">
+                    <span style="color: var(--success);" id="allBuyPct">🟢 50.0% Beli</span>
+                    <span style="color: var(--danger);" id="allSellPct">🔴 50.0% Jual</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-buy" id="allBuyBar" style="width: 50%;"></div>
+                </div>
+                <div class="dom-sub">
+                    <span id="allBuyVal">Buy: Rp 0 (0 Lot)</span>
+                    <span id="allSellVal">Sell: Rp 0 (0 Lot)</span>
+                </div>
+            </div>
+            <div class="dom-card">
+                <div class="dom-header">
+                    <span class="dom-title">⚔️ Head-to-Head Top 3 Teratas</span>
+                    <span class="dom-total" id="top3TotalVal">Total Top 3: Rp 0</span>
+                </div>
+                <div class="dom-stats">
+                    <span style="color: var(--success);" id="top3BuyPct">🟢 50.0% Beli</span>
+                    <span style="color: var(--danger);" id="top3SellPct">🔴 50.0% Jual</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-buy" id="top3BuyBar" style="width: 50%;"></div>
+                </div>
+                <div class="dom-sub">
+                    <span id="top3BuyVal">Top 3 Buy: Rp 0</span>
+                    <span id="top3SellVal">Top 3 Sell: Rp 0</span>
+                </div>
+            </div>
+        </div>
+
+        <label>Metrik Struktur Mikro & Likuiditas</label>
+        <div class="summary-box" id="summaryBox">
+            <div class="summary-item"><div class="stat-value" id="statNetCash">Rp 0</div><div class="stat-label">Inflow/Outflow Bersih</div></div>
+            <div class="summary-item"><div class="stat-value" id="statHHI">0</div><div class="stat-label">HHI Monopoly Index</div></div>
+            <div class="summary-item"><div class="stat-value" id="statMonoBuy">0%</div><div class="stat-label">Monopoli Top 3 Buyer</div></div>
+            <div class="summary-item"><div class="stat-value" id="statMonoSell">0%</div><div class="stat-label">Monopoli Top 3 Seller</div></div>
+            <div class="summary-item"><div class="stat-value" id="statPace">0 Lot/Hari</div><div class="stat-label">Kecepatan Akumulasi</div></div>
+        </div>
+        <label>Rincian Anomali & Eksekusi Per Broker</label>
+        <table id="resultTable">
+            <thead>
+                <tr><th>Broker</th><th>Aksi Net</th><th>Net Vol (Lot)</th><th>Net Cash (Rp)</th><th>Avg/Trade (Agresivitas)</th><th>Status & Floating Bandar</th></tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+        </table>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem;">
+            <button id="exportBtn" class="btn-export" style="margin-top:0;" onclick="exportJournal()" type="button">📋 Copy ke Clipboard</button>
+            <button class="btn-export" style="margin-top:0; border-color:var(--success); color:var(--success);" onclick="saveToCloudJournal()" type="button">☁️ Simpan ke Jurnal Online & Google Sheets</button>
+        </div>
+        <div class="journal-history-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <strong style="font-size:0.85rem; color:var(--info);">📒 Riwayat Jurnal Bandarmology Tersimpan (Browser & Cloud Sync)</strong>
+                <div>
+                    <button type="button" class="pill-btn" onclick="exportAllJournalCsv()">📥 Download CSV</button>
+                    <button type="button" class="pill-btn" style="color:var(--danger);" onclick="clearJournalHistory()">🗑️ Hapus Riwayat</button>
+                </div>
+            </div>
+            <div class="webhook-row">
+                <input type="text" id="gsheetWebhook" placeholder="Opsional: Paste URL Google Apps Script Web App untuk auto-kirim ke Google Sheets..." onchange="saveWebhookUrl()">
+            </div>
+            <div id="journalHistoryList" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted); max-height:180px; overflow-y:auto;"></div>
+        </div>
+
+    </div>
+</div>
+<script>
+    const idxStocks = {"AALI": "Astra Agro Lestari Tbk.", "ABBA": "Mahaka Media Tbk.", "ABDA": "Asuransi Bina Dana Arta Tbk.", "ABMM": "ABM Investama Tbk.", "ACES": "Aspirasi Hidup Indonesia Tbk.", "ACRO": "Samcro Hyosung Adilestari Tbk.", "ACST": "Acset Indonusa Tbk.", "ADCP": "Adhi Commuter Properti Tbk.", "ADES": "Akasha Wira International Tbk.", "ADHI": "Adhi Karya (Persero) Tbk.", "ADMF": "Adira Dinamika Multi Finance Tbk.", "ADMG": "Polychem Indonesia Tbk.", "ADMR": "Adaro Minerals Indonesia Tbk.", "ADRO": "Alamtri Resources Indonesia Tbk.", "AEGS": "Anugerah Spareparts Sejahtera Tbk.", "AGAR": "Asia Sejahtera Mina Tbk.", "AGII": "Samator Indo Gas Tbk.", "AGRO": "Bank Raya Indonesia Tbk.", "AGRS": "Bank IBK Indonesia Tbk.", "AHAP": "Asuransi Harta Aman Pratama Tbk.", "AIMS": "Akbar Indo Makmur Stimec Tbk.", "AISA": "FKS Food Sejahtera Tbk.", "AKKU": "Anugerah Kagum Karya Utama Tbk.", "AKPI": "Argha Karya Prima Industry Tbk.", "AKRA": "AKR Corporindo Tbk.", "AKSI": "Mineral Sumberdaya Mandiri Tbk.", "ALDO": "Alkindo Naratama Tbk.", "ALII": "Ancara Logistics Indonesia Tbk.", "ALKA": "Alakasa Industrindo Tbk.", "ALMI": "Alumindo Light Metal Industry Tbk.", "ALTO": "Tri Banyan Tirta Tbk.", "AMAG": "Asuransi Multi Artha Guna Tbk.", "AMAN": "Makmur Berkah Amanda Tbk.", "AMAR": "Bank Amar Indonesia Tbk.", "AMFG": "Asahimas Flat Glass Tbk.", "AMIN": "Ateliers Mecaniques D'Indonesie Tbk.", "AMMN": "Amman Mineral Internasional Tbk.", "AMMS": "Agung Menjangan Mas Tbk.", "AMOR": "Ashmore Asset Management Indonesia Tbk.", "AMRT": "Sumber Alfaria Trijaya Tbk.", "ANDI": "Andira Agro Tbk.", "ANJT": "Austindo Nusantara Jaya Tbk.", "ANTM": "Aneka Tambang Tbk.", "APEX": "Apexindo Pratama Duta Tbk.", "APIC": "Pacific Strategic Financial Tbk.", "APII": "Arita Prima Indonesia Tbk.", "APLI": "Asiaplast Industries Tbk.", "APLN": "Agung Podomoro Land Tbk.", "ARCI": "Archi Indonesia Tbk.", "AREA": "Dunia Virtual Online Tbk.", "ARGO": "Argo Pantes Tbk.", "ARII": "Atlas Resources Tbk.", "ARKA": "Arkha Jayanti Persada Tbk.", "ARKO": "Arkora Hydro Tbk.", "ARMY": "Armidian Karyatama Tbk.", "ARNA": "Arwana Citramulia Tbk.", "ARTA": "Arthavest Tbk.", "ARTI": "Ratu Prabu Energi Tbk.", "ARTO": "Bank Jago Tbk.", "ASBI": "Asuransi Bintang Tbk.", "ASDM": "Asuransi Dayin Mitra Tbk.", "ASGR": "Astra Graphia Tbk.", "ASHA": "Cilacap Samudera Fishing Industry Tbk.", "ASII": "Astra International Tbk.", "ASJT": "Asuransi Jasa Tania Tbk.", "ASLC": "Autopedia Sukses Lestari Tbk.", "ASLI": "Asri Karya Lestari Tbk.", "ASMI": "Asuransi Maximus Graha Persada Tbk.", "ASPI": "Andalan Sakti Primaindo Tbk.", "ASPR": "Asia Pramulia Tbk.", "ASRI": "Alam Sutera Realty Tbk.", "ASRM": "Asuransi Ramayana Tbk.", "ASSA": "Adi Sarana Armada Tbk.", "ATAP": "Trimitra Prawara Goldland Tbk.", "ATIC": "Anabatic Technologies Tbk.", "ATLA": "Atlantis Subsea Indonesia Tbk.", "AUTO": "Astra Otoparts Tbk.", "AVIA": "Avia Avian Tbk.", "AWAN": "Era Digital Media Tbk.", "AXIO": "Tera Data Indonusa Tbk.", "AYAM": "Janu Putra Sejahtera Tbk.", "AYLS": "Agro Yasa Lestari Tbk.", "BABP": "Bank MNC Internasional Tbk.", "BABY": "Multitrend Indo Tbk.", "BACA": "Bank Capital Indonesia Tbk.", "BAIK": "Bersama Mencapai Puncak Tbk.", "BAJA": "Saranacentral Bajatama Tbk.", "BALI": "Bali Towerindo Sentra Tbk.", "BANK": "Bank Aladin Syariah Tbk.", "BAPA": "Bekasi Asri Pemula Tbk.", "BAPI": "Bhakti Agung Propertindo Tbk.", "BATA": "Sepatu Bata Tbk.", "BATR": "Benteng Api Technic Tbk.", "BAUT": "Mitra Angkasa Sejahtera Tbk.", "BAYU": "Bayu Buana Tbk.", "BBCA": "Bank Central Asia Tbk.", "BBHI": "Allo Bank Indonesia Tbk.", "BBKP": "Bank KB Bukopin Tbk.", "BBLD": "Buana Finance Tbk.", "BBMD": "Bank Mestika Dharma Tbk.", "BBNI": "Bank Negara Indonesia (Persero) Tbk.", "BBRI": "Bank Rakyat Indonesia (Persero) Tbk.", "BBRM": "Pelayaran Nasional Bina Buana Raya Tbk.", "BBSI": "Krom Bank Indonesia Tbk.", "BBSS": "Bumi Benowo Sukses Sejahtera Tbk.", "BBTN": "Bank Tabungan Negara (Persero) Tbk.", "BBYB": "Bank Neo Commerce Tbk.", "BCAP": "MNC Kapital Indonesia Tbk.", "BCIC": "Bank JTrust Indonesia Tbk.", "BCIP": "Bumi Citra Permai Tbk.", "BDKR": "Berdikari Pondasi Perkasa Tbk.", "BDMN": "Bank Danamon Indonesia Tbk.", "BEBS": "Berkah Beton Sadaya Tbk.", "BEEF": "Estika Tata Tiara Tbk.", "BEKS": "Bank Pembangunan Daerah Banten Tbk.", "BELI": "Global Digital Niaga Tbk.", "BELL": "Trisula Textile Industries Tbk.", "BESS": "Batulicin Nusantara Maritim Tbk.", "BEST": "Bekasi Fajar Industrial Estate Tbk.", "BFIN": "BFI Finance Indonesia Tbk.", "BGTG": "Bank Ganesha Tbk.", "BHAT": "Bhakti Multi Artha Tbk.", "BHIT": "MNC Asia Holding Tbk.", "BIKA": "Binakarya Jaya Abadi Tbk.", "BIKE": "Sepeda Bersama Indonesia Tbk.", "BIMA": "Primarindo Asia Infrastructure Tbk.", "BINA": "Bank Ina Perdana Tbk.", "BINO": "Perma Plasindo Tbk.", "BIPI": "Astrindo Nusantara Infrastruktur Tbk.", "BIPP": "Bhuwanatala Indah Permai Tbk.", "BIRD": "Blue Bird Tbk.", "BISI": "BISI International Tbk.", "BJBR": "Bank Pembangunan Daerah Jawa Barat dan Banten Tbk.", "BJTM": "Bank Pembangunan Daerah Jawa Timur Tbk.", "BKDP": "Bukit Darmo Property Tbk.", "BKSL": "Sentul City Tbk.", "BKSW": "Bank QNB Indonesia Tbk.", "BLES": "Superior Prima Sukses Tbk.", "BLOG": "Trimitra Trans Persada Tbk.", "BLTA": "Berlian Laju Tanker Tbk.", "BLTZ": "Graha Layar Prima Tbk.", "BLUE": "Berkah Prima Perkasa Tbk.", "BMAS": "Bank Maspion Indonesia Tbk.", "BMBL": "Lavender Bina Cendikia Tbk.", "BMHS": "Bundamedik Tbk.", "BMRI": "Bank Mandiri (Persero) Tbk.", "BMSR": "Bintang Mitra Semestaraya Tbk.", "BMTR": "Global Mediacom Tbk.", "BNBA": "Bank Bumi Arta Tbk.", "BNBR": "Bakrie & Brothers Tbk.", "BNGA": "Bank CIMB Niaga Tbk.", "BNII": "Bank Maybank Indonesia Tbk.", "BNLI": "Bank Permata Tbk.", "BOBA": "Formosa Ingredient Factory Tbk.", "BOGA": "Bintang Oto Global Tbk.", "BOLA": "Bali Bintang Sejahtera Tbk.", "BOLT": "Garuda Metalindo Tbk.", "BOSS": "Borneo Olah Sarana Sukses Tbk.", "BPFI": "Woori Finance Indonesia Tbk.", "BPII": "Batavia Prosperindo Internasional Tbk.", "BPTR": "Batavia Prosperindo Trans Tbk.", "BRAM": "Indo Kordsa Tbk.", "BREN": "Barito Renewables Energy Tbk.", "BRIS": "Bank Syariah Indonesia Tbk.", "BRMS": "Bumi Resources Minerals Tbk.", "BRNA": "Berlina Tbk.", "BRPT": "Barito Pacific Tbk.", "BRRC": "Raja Roti Cemerlang Tbk.", "BSBK": "Wulandari Bangun Laksana Tbk.", "BSDE": "Bumi Serpong Damai Tbk.", "BSIM": "Bank Sinarmas Tbk.", "BSML": "Bintang Samudera Mandiri Lines Tbk.", "BSSR": "Baramulti Suksessarana Tbk.", "BSWD": "Bank of India Indonesia Tbk.", "BTEK": "Bumi Teknokultura Unggul Tbk.", "BTEL": "Bakrie Telecom Tbk.", "BTON": "Betonjaya Manunggal Tbk.", "BTPN": "Bank SMBC Indonesia Tbk.", "BTPS": "Bank BTPN Syariah Tbk.", "BUAH": "Segar Kumala Indonesia Tbk.", "BUDI": "Budi Starch & Sweetener Tbk.", "BUKA": "Bukalapak.com Tbk.", "BUKK": "Bukaka Teknik Utama Tbk.", "BULL": "Buana Lintas Lautan Tbk.", "BUMI": "Bumi Resources Tbk.", "BUVA": "Bukit Uluwatu Villa Tbk.", "BVIC": "Bank Victoria International Tbk.", "BWPT": "Eagle High Plantations Tbk.", "BYAN": "Bayan Resources Tbk.", "CAKK": "Cahayaputra Asa Keramik Tbk.", "CAMP": "Campina Ice Cream Industry Tbk.", "CANI": "Capitol Nusantara Indonesia Tbk.", "CARE": "Metro Healthcare Indonesia Tbk.", "CARS": "Industri dan Perdagangan Bintraco Dharma Tbk.", "CASA": "Capital Financial Indonesia Tbk.", "CASH": "Cashlez Worldwide Indonesia Tbk.", "CASS": "Cardig Aero Services Tbk.", "CBDK": "Bangun Kosambi Sukses Tbk.", "CBMF": "Cahaya Bintang Medan Tbk.", "CBPE": "Citra Buana Prasida Tbk.", "CBRE": "Cakra Buana Resources Energi Tbk.", "CBUT": "Citra Borneo Utama Tbk.", "CCSI": "Communication Cable Systems Indonesia Tbk.", "CDIA": "Chandra Daya Investasi Tbk.", "CEKA": "Wilmar Cahaya Indonesia Tbk.", "CENT": "Centratama Telekomunikasi Indonesia Tbk.", "CFIN": "Clipan Finance Indonesia Tbk.", "CGAS": "Citra Nusantara Gemilang Tbk.", "CHEK": "Diastika Biotekindo Tbk.", "CHEM": "Chemstar Indonesia Tbk.", "CHIP": "Pelita Teknologi Global Tbk.", "CINT": "Chitose Internasional Tbk.", "CITA": "Cita Mineral Investindo Tbk.", "CITY": "Natura City Developments Tbk.", "CLAY": "Citra Putra Realty Tbk.", "CLEO": "Sariguna Primatirta Tbk.", "CLPI": "Colorpak Indonesia Tbk.", "CMNP": "Citra Marga Nusaphala Persada Tbk.", "CMNT": "Cemindo Gemilang Tbk.", "CMPP": "AirAsia Indonesia Tbk.", "CMRY": "Cisarua Mountain Dairy Tbk.", "CNKO": "Exploitasi Energi Indonesia Tbk.", "CNMA": "Nusantara Sejahtera Raya Tbk.", "CNTX": "Century Textile Industry Tbk.", "COAL": "Black Diamond Resources Tbk.", "COCO": "Wahana Interfood Nusantara Tbk.", "COIN": "Indokripto Koin Semesta Tbk.", "COWL": "Cowell Development Tbk.", "CPIN": "Charoen Pokphand Indonesia Tbk.", "CPRI": "Capri Nusa Satu Properti Tbk.", "CPRO": "Central Proteina Prima Tbk.", "CRAB": "Toba Surimi Industries Tbk.", "CRSN": "Carsurin Tbk.", "CSAP": "Catur Sentosa Adiprana Tbk.", "CSIS": "Cahayasakti Investindo Sukses Tbk.", "CSMI": "Cipta Selera Murni Tbk.", "CSRA": "Cisadane Sawit Raya Tbk.", "CTBN": "Citra Tubindo Tbk.", "CTRA": "Ciputra Development Tbk.", "CTTH": "Citatah Tbk.", "CUAN": "Petrindo Jaya Kreasi Tbk.", "CYBR": "ITSEC Asia Tbk.", "DAAZ": "Daaz Bara Lestari Tbk.", "DADA": "Diamond Citra Propertindo Tbk.", "DART": "Duta Anggada Realty Tbk.", "DATA": "Remala Abadi Tbk.", "DAYA": "Duta Intidaya Tbk.", "DCII": "DCI Indonesia Tbk.", "DEAL": "Dewata Freightinternational Tbk.", "DEFI": "Danasupra Erapacific Tbk.", "DEPO": "Caturkarda Depo Bangunan Tbk.", "DEWA": "Darma Henwa Tbk.", "DEWI": "Dewi Shri Farmindo Tbk.", "DFAM": "Dafam Property Indonesia Tbk.", "DGIK": "Nusa Konstruksi Enjiniring Tbk.", "DGNS": "Diagnos Laboratorium Utama Tbk.", "DGWG": "Delta Giri Wacana Tbk.", "DIGI": "Arkadia Digital Media Tbk.", "DILD": "Intiland Development Tbk.", "DIVA": "Distribusi Voucher Nusantara Tbk.", "DKFT": "Central Omega Resources Tbk.", "DKHH": "Cipta Sarana Medika Tbk.", "DLTA": "Delta Djakarta Tbk.", "DMAS": "Puradelta Lestari Tbk.", "DMMX": "Digital Mediatama Maxima Tbk.", "DMND": "Diamond Food Indonesia Tbk.", "DNAR": "Bank Oke Indonesia Tbk.", "DNET": "Indoritel Makmur Internasional Tbk.", "DOID": "Delta Dunia Makmur Tbk.", "DOOH": "Era Media Sejahtera Tbk.", "DOSS": "Global Sukses Digital Tbk.", "DPNS": "Duta Pertiwi Nusantara Tbk.", "DPUM": "Dua Putra Utama Makmur Tbk.", "DRMA": "Dharma Polimetal Tbk.", "DSFI": "Dharma Samudera Fishing Industries Tbk.", "DSNG": "Dharma Satya Nusantara Tbk.", "DSSA": "Dian Swastatika Sentosa Tbk.", "DUCK": "Jaya Bersama Indo Tbk.", "DUTI": "Duta Pertiwi Tbk.", "DVLA": "Darya-Varia Laboratoria Tbk.", "DWGL": "Dwi Guna Laksana Tbk.", "DYAN": "Dyandra Media International Tbk.", "EAST": "Eastparc Hotel Tbk.", "ECII": "Electronic City Indonesia Tbk.", "EDGE": "Indointernet Tbk.", "EKAD": "Ekadharma International Tbk.", "ELIT": "Data Sinergitama Jaya Tbk.", "ELPI": "Pelayaran Nasional Ekalya Purnamasari Tbk.", "ELSA": "Elnusa Tbk.", "ELTY": "Bakrieland Development Tbk.", "EMAS": "Merdeka Gold Resources Tbk.", "EMDE": "Megapolitan Developments Tbk.", "EMTK": "Elang Mahkota Teknologi Tbk.", "ENAK": "Champ Resto Indonesia Tbk.", "ENRG": "Energi Mega Persada Tbk.", "ENVY": "Envy Technologies Indonesia Tbk.", "ENZO": "Morenzo Abadi Perkasa Tbk.", "EPAC": "Megalestari Epack Sentosaraya Tbk.", "EPMT": "Enseval Putera Megatrading Tbk.", "ERAA": "Erajaya Swasembada Tbk.", "ERAL": "Sinar Eka Selaras Tbk.", "ERTX": "Eratex Djaja Tbk.", "ESIP": "Sinergi Inti Plastindo Tbk.", "ESSA": "ESSA Industries Indonesia Tbk.", "ESTA": "Esta Multi Usaha Tbk.", "ESTI": "Ever Shine Tex Tbk.", "ETWA": "Eterindo Wahanatama Tbk.", "EURO": "Estee Gold Feet Tbk.", "EXCL": "XL Axiata Tbk.", "FAPA": "FAP Agri Tbk.", "FAST": "Fast Food Indonesia Tbk.", "FASW": "Fajar Surya Wisesa Tbk.", "FILM": "MD Entertainment Tbk.", "FIMP": "Fimperkasa Utama Tbk.", "FIRE": "Alfa Energi Investama Tbk.", "FISH": "FKS Multi Agro Tbk.", "FITT": "Hotel Fitra International Tbk.", "FLMC": "Falmaco Nonwoven Industri Tbk.", "FMII": "Fortune Mate Indonesia Tbk.", "FOLK": "Multi Garam Utama Tbk.", "FOOD": "Sentra Food Indonesia Tbk.", "FORE": "Fore Kopi Indonesia Tbk.", "FORU": "Fortune Indonesia Tbk.", "FPNI": "Lotte Chemical Titan Tbk.", "FREN": "Smartfren Telecom Tbk.", "FUJI": "Fuji Finance Indonesia Tbk.", "FUTR": "Futura Energi Global Tbk.", "FWCT": "Wijaya Cahaya Timber Tbk.", "GAMA": "Aksara Global Development Tbk.", "GDST": "Gunawan Dianjaya Steel Tbk.", "GDYR": "Goodyear Indonesia Tbk.", "GEMA": "Gema Grahasarana Tbk.", "GEMS": "Golden Energy Mines Tbk.", "GGRM": "Gudang Garam Tbk.", "GGRP": "Gunung Raja Paksi Tbk.", "GHON": "Gihon Telekomunikasi Indonesia Tbk.", "GIAA": "Garuda Indonesia (Persero) Tbk.", "GJTL": "Gajah Tunggal Tbk.", "GLOB": "Globe Kita Terang Tbk.", "GLVA": "Galva Technologies Tbk.", "GMFI": "Garuda Maintenance Facility Aero Asia Tbk.", "GMTD": "Gowa Makassar Tourism Development Tbk.", "GOLD": "Visi Telekomunikasi Infrastruktur Tbk.", "GOLF": "Intra Golflink Resorts Tbk.", "GOLL": "Golden Plantation Tbk.", "GOOD": "Garudafood Putra Putri Jaya Tbk.", "GOTO": "GoTo Gojek Tokopedia Tbk.", "GPRA": "Perdana Gapuraprima Tbk.", "GPSO": "Geoprima Solusi Tbk.", "GRIA": "Ingria Pratama Capitalindo Tbk.", "GRPH": "Griptha Putra Persada Tbk.", "GRPM": "Graha Prima Mentari Tbk.", "GSMF": "Equity Development Investment Tbk.", "GTBO": "Garda Tujuh Buana Tbk.", "GTRA": "Grahaprima Suksesmandiri Tbk.", "GTSI": "GTS Internasional Tbk.", "GULA": "Aman Agrindo Tbk.", "GUNA": "Gunanusa Eramandiri Tbk.", "GWSA": "Greenwood Sejahtera Tbk.", "GZCO": "Gozco Plantations Tbk.", "HADE": "Himalaya Energi Perkasa Tbk.", "HAIS": "Hasnur Internasional Shipping Tbk.", "HAJJ": "Arsy Buana Travelindo Tbk.", "HALO": "Haloni Jane Tbk.", "HATM": "Habco Trans Maritima Tbk.", "HBAT": "Minahasa Membangun Hebat Tbk.", "HDFA": "Radana Bhaskara Finance Tbk.", "HDIT": "Hensel Davest Indonesia Tbk.", "HEAL": "Medikaloka Hermina Tbk.", "HELI": "Jaya Trishindo Tbk.", "HERO": "Hero Supermarket Tbk.", "HEXA": "Hexindo Adiperkasa Tbk.", "HGII": "Hero Global Investment Tbk.", "HILL": "Hillcon Tbk.", "HITS": "Humpuss Intermoda Transportasi Tbk.", "HKMU": "HK Metals Utama Tbk.", "HMSP": "H.M. Sampoerna Tbk.", "HOKI": "Buyung Poetra Sembada Tbk.", "HOME": "Hotel Mandarine Regency Tbk.", "HOMI": "Grand House Mulia Tbk.", "HOPE": "Harapan Duta Pertiwi Tbk.", "HOTL": "Saraswati Griya Lestari Tbk.", "HRME": "Menteng Heritage Realty Tbk.", "HRTA": "Hartadinata Abadi Tbk.", "HRUM": "Harum Energy Tbk.", "HUMI": "Humpuss Maritim Internasional Tbk.", "HYGN": "Ecocare Indo Pasifik Tbk.", "IATA": "MNC Energy Investments Tbk.", "IBFN": "Intan Baruprana Finance Tbk.", "IBOS": "Indo Boga Sukses Tbk.", "IBST": "Inti Bangun Sejahtera Tbk.", "ICBP": "Indofood CBP Sukses Makmur Tbk.", "ICON": "Island Concepts Indonesia Tbk.", "IDEA": "Idea Indonesia Akademi Tbk.", "IDPR": "Indonesia Pondasi Raya Tbk.", "IFII": "Indonesia Fibreboard Industry Tbk.", "IFSH": "Ifishdeco Tbk.", "IGAR": "Champion Pacific Indonesia Tbk.", "IIKP": "Inti Agri Resources Tbk.", "IKAI": "Intikeramik Alamasri Industri Tbk.", "IKAN": "Era Mandiri Cemerlang Tbk.", "IKBI": "Sumi Indo Kabel Tbk.", "IKPM": "Ikapharmindo Putramas Tbk.", "IMAS": "Indomobil Sukses Internasional Tbk.", "IMJS": "Indomobil Multi Jasa Tbk.", "IMPC": "Impack Pratama Industri Tbk.", "INAF": "Indofarma Tbk.", "INAI": "Indal Aluminium Industry Tbk.", "INCF": "Indo Komoditi Korpora Tbk.", "INCI": "Intanwijaya Internasional Tbk.", "INCO": "Vale Indonesia Tbk.", "INDF": "Indofood Sukses Makmur Tbk.", "INDO": "Royalindo Investa Wijaya Tbk.", "INDR": "Indo-Rama Synthetics Tbk.", "INDS": "Indospring Tbk.", "INDX": "Tanah Laut Tbk.", "INDY": "Indika Energy Tbk.", "INET": "Sinergi Inti Andalan Prima Tbk.", "INKP": "Indah Kiat Pulp & Paper Tbk.", "INOV": "Inocycle Technology Group Tbk.", "INPC": "Bank Artha Graha Internasional Tbk.", "INPP": "Indonesian Paradise Property Tbk.", "INPS": "Indah Prakasa Sentosa Tbk.", "INRU": "Toba Pulp Lestari Tbk.", "INTA": "Intraco Penta Tbk.", "INTD": "Inter Delta Tbk.", "INTP": "Indocement Tunggal Prakarsa Tbk.", "IOTF": "Sumber Sinergi Makmur Tbk.", "IPAC": "Era Graharealty Tbk.", "IPCC": "Indonesia Kendaraan Terminal Tbk.", "IPCM": "Jasa Armada Indonesia Tbk.", "IPOL": "Indopoly Swakarsa Industry Tbk.", "IPPE": "Indo Pureco Pratama Tbk.", "IPTV": "MNC Vision Networks Tbk.", "IRRA": "Itama Ranoraya Tbk.", "IRSX": "Aviana Sinar Abadi Tbk.", "ISAP": "Isra Presisi Indonesia Tbk.", "ISAT": "Indosat Tbk.", "ISSP": "Steel Pipe Industry of Indonesia Tbk.", "ITIC": "Indonesian Tobacco Tbk.", "ITMA": "Sumber Energi Andalan Tbk.", "ITMG": "Indo Tambangraya Megah Tbk.", "JARR": "Jhonlin Agro Raya Tbk.", "JAST": "Jasnita Telekomindo Tbk.", "JATI": "Informasi Teknologi Indonesia Tbk.", "JAWA": "Jaya Agra Wattie Tbk.", "JAYA": "Armada Berjaya Trans Tbk.", "JECC": "Jembo Cable Company Tbk.", "JGLE": "Graha Andrasentra Propertindo Tbk.", "JIHD": "Jakarta International Hotels & Development Tbk.", "JKON": "Jaya Konstruksi Manggala Pratama Tbk.", "JKSW": "Jakarta Kyoei Steel Works Tbk.", "JMAS": "Asuransi Jiwa Syariah Jasa Mitra Abadi Tbk.", "JPFA": "Japfa Comfeed Indonesia Tbk.", "JRPT": "Jaya Real Property Tbk.", "JSKY": "Sky Energy Indonesia Tbk.", "JSMR": "Jasa Marga (Persero) Tbk.", "JSPT": "Jakarta Setiabudi Internasional Tbk.", "JTPE": "Jasuindo Tiga Perkasa Tbk.", "KAEF": "Kimia Farma Tbk.", "KAQI": "Jantra Grupo Indonesia Tbk.", "KARW": "ICTSI Jasa Prima Tbk.", "KAYU": "Darmi Bersaudara Tbk.", "KBAG": "Karya Bersama Anugerah Tbk.", "KBLI": "KMI Wire & Cable Tbk.", "KBLM": "Kabelindo Murni Tbk.", "KBLV": "First Media Tbk.", "KBRI": "Kertas Basuki Rachmat Indonesia Tbk.", "KDSI": "Kedawung Setia Industrial Tbk.", "KDTN": "Puri Sentul Permai Tbk.", "KEEN": "Kencana Energi Lestari Tbk.", "KEJU": "Mulia Boga Raya Tbk.", "KETR": "Ketrosden Triasmitra Tbk.", "KIAS": "Keramika Indonesia Assosiasi Tbk.", "KICI": "Kedaung Indah Can Tbk.", "KIJA": "Kawasan Industri Jababeka Tbk.", "KING": "Hoffmen Cleanindo Tbk.", "KINO": "Kino Indonesia Tbk.", "KIOS": "Kioson Komersial Indonesia Tbk.", "KJEN": "Krida Jaringan Nusantara Tbk.", "KKES": "Kusuma Kemindo Sentosa Tbk.", "KKGI": "Resource Alam Indonesia Tbk.", "KLAS": "Pelayaran Kurnia Lautan Semesta Tbk.", "KLBF": "Kalbe Farma Tbk.", "KLIN": "Klinko Karya Imaji Tbk.", "KMDS": "Kurniamitra Duta Sentosa Tbk.", "KMTR": "Kirana Megatara Tbk.", "KOBX": "Kobexindo Tractors Tbk.", "KOCI": "Kokoh Exa Nusantara Tbk.", "KOIN": "Kokoh Inti Arebama Tbk.", "KOKA": "Koka Indonesia Tbk.", "KONI": "Perdana Bangun Pusaka Tbk.", "KOPI": "Mitra Energi Persada Tbk.", "KOTA": "DMS Propertindo Tbk.", "KPAL": "Steadfast Marine Tbk.", "KPAS": "Cottonindo Ariesta Tbk.", "KPIG": "MNC Land Tbk.", "KRAH": "Grand Kartech Tbk.", "KRAS": "Krakatau Steel (Persero) Tbk.", "KREN": "Quantum Clovera Investama Tbk.", "KRYA": "Bangun Karya Perkasa Jaya Tbk.", "KSIX": "Kentanix Supra International Tbk.", "KUAS": "Ace Oldfields Tbk.", "LABA": "Green Power Group Tbk.", "LABS": "UBC Medical Indonesia Tbk.", "LAJU": "Jasa Berdikari Logistics Tbk.", "LAND": "Trimitra Propertindo Tbk.", "LAPD": "Leyand International Tbk.", "LCGP": "Eureka Prima Jakarta Tbk.", "LCKM": "LCK Global Kedaton Tbk.", "LEAD": "Logindo Samudramakmur Tbk.", "LFLO": "Imago Mulia Persada Tbk.", "LIFE": "Asuransi Jiwa Sinarmas MSIG Tbk.", "LINK": "Link Net Tbk.", "LION": "Lion Metal Works Tbk.", "LIVE": "Homeco Victoria Makmur Tbk.", "LMAS": "Limas Indonesia Makmur Tbk.", "LMPI": "Langgeng Makmur Industri Tbk.", "LMSH": "Lionmesh Prima Tbk.", "LOPI": "Logisticsplus International Tbk.", "LPCK": "Lippo Cikarang Tbk.", "LPGI": "Lippo General Insurance Tbk.", "LPIN": "Multi Prima Sejahtera Tbk.", "LPKR": "Lippo Karawaci Tbk.", "LPLI": "Star Pacific Tbk.", "LPPF": "Matahari Department Store Tbk.", "LPPS": "Lenox Pasifik Investama Tbk.", "LRNA": "Eka Sari Lorena Transport Tbk.", "LSIP": "PP London Sumatra Indonesia Tbk.", "LTLS": "Lautan Luas Tbk.", "LUCK": "Sentral Mitra Informatika Tbk.", "LUCY": "Lima Dua Lima Tiga Tbk.", "MABA": "Marga Abhinaya Abadi Tbk.", "MAGP": "Multi Agro Gemilang Plantation Tbk.", "MAHA": "Mandiri Herindo Adiperkasa Tbk.", "MAIN": "Malindo Feedmill Tbk.", "MAMI": "Mas Murni Indonesia Tbk.", "MANG": "Manggung Polahraya Tbk.", "MAPA": "Map Aktif Adiperkasa Tbk.", "MAPB": "MAP Boga Adiperkasa Tbk.", "MAPI": "Mitra Adiperkasa Tbk.", "MARI": "Mahaka Radio Integra Tbk.", "MARK": "Mark Dynamics Indonesia Tbk.", "MASA": "Multistrada Arah Sarana Tbk.", "MASB": "Bank Multiarta Sentosa Tbk.", "MAXI": "Maxindo Karya Anugerah Tbk.", "MAYA": "Bank Mayapada Internasional Tbk.", "MBAP": "Mitrabara Adiperdana Tbk.", "MBMA": "Merdeka Battery Materials Tbk.", "MBSS": "Mitrabahtera Segara Sejati Tbk.", "MBTO": "Martina Berto Tbk.", "MCAS": "M Cash Integrasi Tbk.", "MCOL": "Prima Andalan Mandiri Tbk.", "MCOR": "Bank China Construction Bank Indonesia Tbk.", "MDIA": "Intermedia Capital Tbk.", "MDKA": "Merdeka Copper Gold Tbk.", "MDKI": "Emdeki Utama Tbk.", "MDLA": "Medela Potentia Tbk.", "MDLN": "Modernland Realty Tbk.", "MDRN": "Modern Internasional Tbk.", "MEDC": "Medco Energi Internasional Tbk.", "MEDS": "Hetzer Medical Indonesia Tbk.", "MEGA": "Bank Mega Tbk.", "MEJA": "Harta Djaya Karya Tbk.", "MENN": "Menn Teknologi Indonesia Tbk.", "MERI": "Merry Riana Edukasi Tbk.", "MERK": "Merck Tbk.", "META": "Nusantara Infrastructure Tbk.", "MFIN": "Mandala Multifinance Tbk.", "MFMI": "Multifiling Mitra Indonesia Tbk.", "MGLV": "Panca Anugrah Wisesa Tbk.", "MGNA": "Magna Investama Mandiri Tbk.", "MGRO": "Mahkota Group Tbk.", "MHKI": "Multi Hanna Kreasindo Tbk.", "MICE": "Multi Indocitra Tbk.", "MIDI": "Midi Utama Indonesia Tbk.", "MIKA": "Mitra Keluarga Karyasehat Tbk.", "MINA": "Sanurhasta Mitra Tbk.", "MINE": "Sinar Terang Mandiri Tbk.", "MIRA": "Mitra International Resources Tbk.", "MITI": "Mitra Investindo Tbk.", "MKAP": "Multikarya Asia Pasifik Raya Tbk.", "MKNT": "Mitra Komunikasi Nusantara Tbk.", "MKPI": "Metropolitan Kentjana Tbk.", "MKTR": "Menthobi Karyatama Raya Tbk.", "MLBI": "Multi Bintang Indonesia Tbk.", "MLIA": "Mulia Industrindo Tbk.", "MLPL": "Multipolar Tbk.", "MLPT": "Multipolar Technology Tbk.", "MMIX": "Multi Medika Internasional Tbk.", "MMLP": "Mega Manunggal Property Tbk.", "MNCN": "Media Nusantara Citra Tbk.", "MOLI": "Madusari Murni Indah Tbk.", "MORA": "Mora Telematika Indonesia Tbk.", "MPMX": "Mitra Pinasthika Mustika Tbk.", "MPOW": "Megapower Makmur Tbk.", "MPPA": "Matahari Putra Prima Tbk.", "MPRO": "Maha Properti Indonesia Tbk.", "MPXL": "MPX Logistics International Tbk.", "MRAT": "Mustika Ratu Tbk.", "MREI": "Maskapai Reasuransi Indonesia Tbk.", "MSIE": "Multisarana Intan Eduka Tbk.", "MSIN": "MNC Digital Entertainment Tbk.", "MSJA": "Multi Spunindo Jaya Tbk.", "MSKY": "MNC Sky Vision Tbk.", "MSTI": "Mastersystem Infotama Tbk.", "MTDL": "Metrodata Electronics Tbk.", "MTEL": "Dayamitra Telekomunikasi Tbk.", "MTFN": "Capitalinc Investment Tbk.", "MTLA": "Metropolitan Land Tbk.", "MTMH": "Murni Sadar Tbk.", "MTPS": "Meta Epsi Tbk.", "MTRA": "Mitra Pemuda Tbk.", "MTSM": "Metro Realty Tbk.", "MTWI": "Malacca Trust Wuwungan Insurance Tbk.", "MUTU": "Mutuagung Lestari Tbk.", "MYOH": "Samindo Resources Tbk.", "MYOR": "Mayora Indah Tbk.", "MYTX": "Asia Pacific Investama Tbk.", "NAIK": "Adiwarna Anugerah Abadi Tbk.", "NANO": "Nanotech Indonesia Global Tbk.", "NASA": "Andalan Perkasa Abadi Tbk.", "NASI": "Wahana Inti Makmur Tbk.", "NATO": "Surya Permata Andalan Tbk.", "NAYZ": "Hassana Boga Sejahtera Tbk.", "NCKL": "Trimegah Bangun Persada Tbk.", "NELY": "Pelayaran Nelly Dwi Putri Tbk.", "NEST": "Esta Indonesia Tbk.", "NETV": "MDTV Media Technologies Tbk.", "NFCX": "NFC Indonesia Tbk.", "NICE": "Adhi Kartiko Pratama Tbk.", "NICK": "Charnic Capital Tbk.", "NICL": "PAM Mineral Tbk.", "NIKL": "Pelat Timah Nusantara Tbk.", "NINE": "Techno9 Indonesia Tbk.", "NIRO": "City Retail Developments Tbk.", "NISP": "Bank OCBC NISP Tbk.", "NOBU": "Bank Nationalnobu Tbk.", "NPGF": "Nusa Palapa Gemilang Tbk.", "NRCA": "Nusa Raya Cipta Tbk.", "NSSS": "Nusantara Sawit Sejahtera Tbk.", "NTBK": "Nusatama Berkah Tbk.", "NUSA": "Sinergi Megah Internusa Tbk.", "NZIA": "Nusantara Almazia Tbk.", "OASA": "Maharaksa Biru Energi Tbk.", "OBAT": "Brigit Biofarmaka Teknologi Tbk.", "OBMD": "OBM Drilchem Tbk.", "OCAP": "Onix Capital Tbk.", "OILS": "Indo Oil Perkasa Tbk.", "OKAS": "Ancora Indonesia Resources Tbk.", "OLIV": "Oscar Mitra Sukses Sejahtera Tbk.", "OMED": "Jayamas Medica Industri Tbk.", "OMRE": "Indonesia Prima Property Tbk.", "OPMS": "Optima Prima Metal Sinergi Tbk.", "PACK": "Abadi Nusantara Hijau Investama Tbk.", "PADA": "Personel Alih Daya Tbk.", "PADI": "Minna Padi Investama Sekuritas Tbk.", "PALM": "Provident Investasi Bersama Tbk.", "PAMG": "Bima Sakti Pertiwi Tbk.", "PANI": "Pantai Indah Kapuk Dua Tbk.", "PANR": "Panorama Sentrawisata Tbk.", "PANS": "Panin Sekuritas Tbk.", "PART": "Cipta Perdana Lancar Tbk.", "PBID": "Panca Budi Idaman Tbk.", "PBRX": "Pan Brothers Tbk.", "PBSA": "Paramita Bangun Sarana Tbk.", "PCAR": "Prima Cakrawala Abadi Tbk.", "PDES": "Destinasi Tirta Nusantara Tbk.", "PDPP": "Primadaya Plastisindo Tbk.", "PEGE": "Panca Global Kapital Tbk.", "PEHA": "Phapros Tbk.", "PEVE": "Penta Valent Tbk.", "PGAS": "Perusahaan Gas Negara Tbk.", "PGEO": "Pertamina Geothermal Energy Tbk.", "PGJO": "Tourindo Guide Indonesia Tbk.", "PGLI": "Pembangunan Graha Lestari Indah Tbk.", "PGUN": "Pradiksi Gunatama Tbk.", "PICO": "Pelangi Indah Canindo Tbk.", "PIPA": "Multi Makmur Lemindo Tbk.", "PJAA": "Pembangunan Jaya Ancol Tbk.", "PJHB": "Pelayaran Jaya Hidup Baru Tbk.", "PKPK": "Perdana Karya Perkasa Tbk.", "PLAN": "Planet Properindo Jaya Tbk.", "PLAS": "Polaris Investama Tbk.", "PLIN": "Plaza Indonesia Realty Tbk.", "PMJS": "Putra Mandiri Jembar Tbk.", "PMMP": "Panca Mitra Multiperdana Tbk.", "PMUI": "Prima Multi Usaha Indonesia Tbk.", "PNBN": "Bank Pan Indonesia Tbk.", "PNBS": "Bank Panin Dubai Syariah Tbk.", "PNGO": "Pinago Utama Tbk.", "PNIN": "Paninvest Tbk.", "PNLF": "Panin Financial Tbk.", "PNSE": "Pudjiadi & Sons Tbk.", "POLA": "Pool Advista Finance Tbk.", "POLI": "Pollux Hotels Group Tbk.", "POLL": "Pollux Properties Indonesia Tbk.", "POLU": "Golden Flower Tbk.", "POLY": "Asia Pacific Fibers Tbk.", "POOL": "Pool Advista Indonesia Tbk.", "PORT": "Nusantara Pelabuhan Handal Tbk.", "POSA": "Bliss Properti Indonesia Tbk.", "POWR": "Cikarang Listrindo Tbk.", "PPGL": "Prima Globalindo Logistik Tbk.", "PPRE": "PP Presisi Tbk.", "PPRI": "Paperocks Indonesia Tbk.", "PPRO": "PP Properti Tbk.", "PRAS": "Prima Alloy Steel Universal Tbk.", "PRDA": "Prodia Widyahusada Tbk.", "PRIM": "Royal Prima Tbk.", "PSAB": "J Resources Asia Pasifik Tbk.", "PSAT": "Pancaran Samudera Transport Tbk.", "PSDN": "Prasidha Aneka Niaga Tbk.", "PSGO": "Palma Serasih Tbk.", "PSKT": "Red Planet Indonesia Tbk.", "PSSI": "IMC Pelita Logistik Tbk.", "PTBA": "Bukit Asam Tbk.", "PTDU": "Djasa Ubersakti Tbk.", "PTIS": "Indo Straits Tbk.", "PTMP": "Mitra Pack Tbk.", "PTMR": "Master Print Tbk.", "PTPP": "PP (Persero) Tbk.", "PTPS": "Pulau Subur Tbk.", "PTPW": "Pratama Widya Tbk.", "PTRO": "Petrosea Tbk.", "PTSN": "Sat Nusapersada Tbk.", "PTSP": "Pioneerindo Gourmet International Tbk.", "PUDP": "Pudjiadi Prestige Tbk.", "PURA": "Putra Rajawali Kencana Tbk.", "PURE": "Trinitan Metals and Minerals Tbk.", "PURI": "Puri Global Sukses Tbk.", "PWON": "Pakuwon Jati Tbk.", "PYFA": "Pyridam Farma Tbk.", "PZZA": "Sarimelati Kencana Tbk.", "RAAM": "Tripar Multivision Plus Tbk.", "RAFI": "Sari Kreasi Boga Tbk.", "RAJA": "Rukun Raharja Tbk.", "RALS": "Ramayana Lestari Sentosa Tbk.", "RANC": "Supra Boga Lestari Tbk.", "RATU": "Raharja Energi Cepu Tbk.", "RBMS": "Ristia Bintang Mahkotasejati Tbk.", "RCCC": "Utama Radar Cahaya Tbk.", "RDTX": "Roda Vivatex Tbk.", "REAL": "Repower Asia Indonesia Tbk.", "RELF": "Graha Mitra Asia Tbk.", "RELI": "Reliance Sekuritas Indonesia Tbk.", "RGAS": "Kian Santang Muliatama Tbk.", "RICY": "Ricky Putra Globalindo Tbk.", "RIGS": "Rig Tenders Indonesia Tbk.", "RIMO": "Rimo International Lestari Tbk.", "RISE": "Jaya Sukses Makmur Sentosa Tbk.", "RLCO": "Abadi Lestari Indonesia Tbk.", "RMKE": "RMK Energy Tbk.", "RMKO": "Royaltama Mulia Kontraktorindo Tbk.", "ROCK": "Rockfields Properti Indonesia Tbk.", "RODA": "Pikko Land Development Tbk.", "RONY": "Aesler Grup Internasional Tbk.", "ROTI": "Nippon Indosari Corpindo Tbk.", "RSCH": "Charlie Hospital Semarang Tbk.", "RSGK": "Kedoya Adyaraya Tbk.", "RUIS": "Radiant Utama Interinsco Tbk.", "RUNS": "Global Sukses Solusi Tbk.", "SAFE": "Steady Safe Tbk.", "SAGE": "Saptausaha Gemilangindah Tbk.", "SAME": "Sarana Meditama Metropolitan Tbk.", "SAMF": "Saraswanti Anugerah Makmur Tbk.", "SAPX": "Satria Antaran Prima Tbk.", "SATU": "Kota Satu Properti Tbk.", "SBAT": "Sejahtera Bintang Abadi Textile Tbk.", "SBMA": "Surya Biru Murni Acetylene Tbk.", "SCCO": "Supreme Cable Manufacturing & Commerce Tbk.", "SCMA": "Surya Citra Media Tbk.", "SCNP": "Selaras Citra Nusantara Perkasa Tbk.", "SCPI": "Organon Pharma Indonesia Tbk.", "SDMU": "Sidomulyo Selaras Tbk.", "SDPC": "Millennium Pharmacon International Tbk.", "SDRA": "Bank Woori Saudara Indonesia 1906 Tbk.", "SEMA": "Semacom Integrated Tbk.", "SFAN": "Surya Fajar Capital Tbk.", "SGER": "Sumber Global Energy Tbk.", "SGRO": "Sampoerna Agro Tbk.", "SHID": "Hotel Sahid Jaya International Tbk.", "SHIP": "Sillo Maritime Perdana Tbk.", "SICO": "Sigma Energy Compressindo Tbk.", "SIDO": "Industri Jamu dan Farmasi Sido Muncul Tbk.", "SILO": "Siloam International Hospitals Tbk.", "SIMA": "Siwani Makmur Tbk.", "SIMP": "Salim Ivomas Pratama Tbk.", "SINI": "Singaraja Putra Tbk.", "SIPD": "Sreeya Sewu Indonesia Tbk.", "SKBM": "Sekar Bumi Tbk.", "SKLT": "Sekar Laut Tbk.", "SKRN": "Superkrane Mitra Utama Tbk.", "SKYB": "Northcliff Citranusa Indonesia Tbk.", "SLIS": "Gaya Abadi Sempurna Tbk.", "SMAR": "Smart Tbk.", "SMBR": "Semen Baturaja Tbk.", "SMCB": "Solusi Bangun Indonesia Tbk.", "SMDM": "Suryamas Dutamakmur Tbk.", "SMDR": "Samudera Indonesia Tbk.", "SMGA": "Sumber Mineral Global Abadi Tbk.", "SMGR": "Semen Indonesia (Persero) Tbk.", "SMIL": "Sarana Mitra Luas Tbk.", "SMKL": "Satyamitra Kemas Lestari Tbk.", "SMKM": "Sumber Mas Konstruksi Tbk.", "SMLE": "Sinergi Multi Lestarindo Tbk.", "SMMA": "Sinarmas Multiartha Tbk.", "SMMT": "Golden Eagle Energy Tbk.", "SMRA": "Summarecon Agung Tbk.", "SMRU": "SMR Utama Tbk.", "SMSM": "Selamat Sempurna Tbk.", "SNLK": "Sunter Lakeside Hotel Tbk.", "SOCI": "Soechi Lines Tbk.", "SOFA": "Boston Furniture Industries Tbk.", "SOHO": "Soho Global Health Tbk.", "SOLA": "Xolare RCR Energy Tbk.", "SONA": "Sona Topas Tourism Industry Tbk.", "SOSS": "Shield On Service Tbk.", "SOTS": "Satria Mega Kencana Tbk.", "SOUL": "Mitra Tirta Buwana Tbk.", "SPMA": "Suparma Tbk.", "SPRE": "Soraya Berjaya Indonesia Tbk.", "SPTO": "Surya Pertiwi Tbk.", "SQMI": "Wilton Makmur Indonesia Tbk.", "SRAJ": "Sejahteraraya Anugrahjaya Tbk.", "SRIL": "Sri Rejeki Isman Tbk.", "SRSN": "Indo Acidatama Tbk.", "SRTG": "Saratoga Investama Sedaya Tbk.", "SSIA": "Surya Semesta Internusa Tbk.", "SSMS": "Sawit Sumbermas Sarana Tbk.", "SSTM": "Sunson Textile Manufacture Tbk.", "STAA": "Sumber Tani Agung Resources Tbk.", "STAR": "Buana Artha Anugerah Tbk.", "STRK": "Lovina Beach Brewery Tbk.", "STTP": "Siantar Top Tbk.", "SUGI": "Sugih Energy Tbk.", "SULI": "SLJ Global Tbk.", "SUNI": "Sunindo Pratama Tbk.", "SUPR": "Solusi Tunas Pratama Tbk.", "SURE": "Super Energy Tbk.", "SURI": "Maja Agung Latexindo Tbk.", "SWAT": "Sriwahana Adityakarta Tbk.", "SWID": "Saraswanti Indoland Development Tbk.", "TALF": "Tunas Alfin Tbk.", "TAMA": "Lancartama Sejati Tbk.", "TAMU": "Pelayaran Tamarin Samudra Tbk.", "TAPG": "Triputra Agro Persada Tbk.", "TARA": "Agung Semesta Sejahtera Tbk.", "TAXI": "Express Transindo Utama Tbk.", "TAYS": "Jaya Swarasa Agung Tbk.", "TBIG": "Tower Bersama Infrastructure Tbk.", "TBLA": "Tunas Baru Lampung Tbk.", "TBMS": "Tembaga Mulia Semanan Tbk.", "TCID": "Mandom Indonesia Tbk.", "TCPI": "Transcoal Pacific Tbk.", "TDPM": "Tridomain Performance Materials Tbk.", "TEBE": "Dana Brata Luhur Tbk.", "TECH": "Indosterling Technomedia Tbk.", "TELE": "Omni Inovasi Indonesia Tbk.", "TFAS": "Telefast Indonesia Tbk.", "TFCO": "Tifico Fiber Indonesia Tbk.", "TGKA": "Tigaraksa Satria Tbk.", "TGRA": "Terregra Asia Energy Tbk.", "TGUK": "Platinum Wahab Nusantara Tbk.", "TIFA": "KDB Tifa Finance Tbk.", "TINS": "Timah Tbk.", "TIRA": "Tira Austenite Tbk.", "TIRT": "Tirta Mahakam Resources Tbk.", "TKIM": "Pabrik Kertas Tjiwi Kimia Tbk.", "TLDN": "Teladan Prima Agro Tbk.", "TLKM": "Telkom Indonesia (Persero) Tbk.", "TMAS": "Temas Tbk.", "TMPO": "Tempo Inti Media Tbk.", "TNCA": "Trimuda Nuansa Citra Tbk.", "TOBA": "TBS Energi Utama Tbk.", "TOOL": "Rohartindo Nusantara Luas Tbk.", "TOPS": "Totalindo Eka Persada Tbk.", "TOSK": "Topindo Solusi Komunika Tbk.", "TOTL": "Total Bangun Persada Tbk.", "TOTO": "Surya Toto Indonesia Tbk.", "TOWR": "Sarana Menara Nusantara Tbk.", "TOYS": "Sunindo Adipersada Tbk.", "TPIA": "Chandra Asri Pacific Tbk.", "TPMA": "Trans Power Marine Tbk.", "TRAM": "Trada Alam Minera Tbk.", "TRGU": "Cerestar Indonesia Tbk.", "TRIL": "Triwira Insanlestari Tbk.", "TRIM": "Trimegah Sekuritas Indonesia Tbk.", "TRIN": "Perintis Triniti Properti Tbk.", "TRIO": "Trikomsel Oke Tbk.", "TRIS": "Trisula International Tbk.", "TRJA": "Transkon Jaya Tbk.", "TRST": "Trias Sentosa Tbk.", "TRUE": "Triniti Dinamik Tbk.", "TRUK": "Guna Timur Raya Tbk.", "TRUS": "Trust Finance Indonesia Tbk.", "TSPC": "Tempo Scan Pacific Tbk.", "TUGU": "Asuransi Tugu Pratama Indonesia Tbk.", "TYRE": "King Tire Indonesia Tbk.", "UANG": "Pakuan Tbk.", "UCID": "Uni-Charm Indonesia Tbk.", "UDNG": "Agro Bahari Nusantara Tbk.", "UFOE": "Damai Sejahtera Abadi Tbk.", "ULTJ": "Ultra Jaya Milk Industry & Trading Company Tbk.", "UNIC": "Unggul Indah Cahaya Tbk.", "UNIQ": "Ulima Nitra Tbk.", "UNIT": "Nusantara Inti Corpora Tbk.", "UNSP": "Bakrie Sumatera Plantations Tbk.", "UNTD": "Terang Dunia Internusa Tbk.", "UNTR": "United Tractors Tbk.", "UNVR": "Unilever Indonesia Tbk.", "URBN": "Urban Jakarta Propertindo Tbk.", "UVCR": "Trimegah Karya Pratama Tbk.", "VAST": "Vastland Indonesia Tbk.", "VERN": "Verona Indah Pictures Tbk.", "VICI": "Victoria Care Indonesia Tbk.", "VICO": "Victoria Investama Tbk.", "VINS": "Victoria Insurance Tbk.", "VISI": "Satu Visi Putra Tbk.", "VIVA": "Visi Media Asia Tbk.", "VKTR": "VKTR Teknologi Mobilitas Tbk.", "VOKS": "Voksel Electric Tbk.", "VRNA": "Mizuho Leasing Indonesia Tbk.", "VTNY": "Venteny Fortuna International Tbk.", "WAPO": "Wahana Pronatural Tbk.", "WEGE": "Wijaya Karya Bangunan Gedung Tbk.", "WEHA": "WEHA Transportasi Indonesia Tbk.", "WGSH": "Wira Global Solusi Tbk.", "WICO": "Wicaksana Overseas International Tbk.", "WIDI": "Widiant Jaya Krenindo Tbk.", "WIFI": "Solusi Sinergi Digital Tbk.", "WIIM": "Wismilak Inti Makmur Tbk.", "WIKA": "Wijaya Karya (Persero) Tbk.", "WINE": "Hatten Bali Tbk.", "WINR": "Winner Nusantara Jaya Tbk.", "WINS": "Wintermar Offshore Marine Tbk.", "WIRG": "WIR ASIA Tbk.", "WMPP": "Widodo Makmur Perkasa Tbk.", "WMUU": "Widodo Makmur Unggas Tbk.", "WOMF": "Wahana Ottomitra Multiartha Tbk.", "WOOD": "Integra Indocabinet Tbk.", "WOWS": "Ginting Jaya Energi Tbk.", "WSBP": "Waskita Beton Precast Tbk.", "WSKT": "Waskita Karya (Persero) Tbk.", "WTON": "Wijaya Karya Beton Tbk.", "YELO": "Yelooo Integra Datanet Tbk.", "YOII": "Asuransi Digital Bersama Tbk.", "YPAS": "Yanaprima Hastapersada Tbk.", "YULE": "Yulie Sekuritas Indonesia Tbk.", "YUPI": "Yupi Indo Jelly Gum Tbk.", "ZATA": "Bersama Zatta Jaya Tbk.", "ZBRA": "Dosni Roha Indonesia Tbk.", "ZINC": "Kapuas Prima Coal Tbk.", "ZONE": "Mega Perintis Tbk.", "ZYRX": "Zyrexindo Mandiri Buana Tbk."};
+    const idxEntries = Object.entries(idxStocks);
+
+    const brokerNames = {"AD":"Sukadana Prima Sekuritas","AF":"Harita Kencana Sekuritas","AG":"Kiwoom Sekuritas Indonesia","AH":"Shinhan Sekuritas Indonesia","AI":"Kay Hian Sekuritas","AK":"UBS Sekuritas Indonesia","AO":"Erdikha Elit Sekuritas","AP":"Pacific Sekuritas Indonesia","AR":"Binaartha Sekuritas","AT":"Phintraco Sekuritas","AZ":"Sucor Sekuritas","BB":"Verdhana Sekuritas Indonesia","BF":"Inti Fikasa Sekuritas","BK":"J.P. Morgan Sekuritas Indonesia","BQ":"Korea Investment and Sekuritas Indonesia","BR":"Trust Sekuritas","BS":"Equity Sekuritas Indonesia","CC":"Mandiri Sekuritas","CD":"Mega Capital Sekuritas","CP":"KB Valbury Sekuritas","DD":"Makindo Sekuritas","DH":"Sinarmas Sekuritas","DP":"DBS Vickers Sekuritas Indonesia","DR":"RHB Sekuritas Indonesia","DU":"KAF Sekuritas Indonesia","DX":"Bahana Sekuritas","EL":"Evergreen Sekuritas Indonesia","EP":"MNC Sekuritas","ES":"Ekokapital Sekuritas","FO":"Forte Global Sekuritas","FS":"Yuanta Sekuritas Indonesia","FZ":"Waterfront Sekuritas Indonesia","GA":"BNC Sekuritas Indonesia","GI":"Webull Sekuritas Indonesia","GR":"Panin Sekuritas Tbk.","HD":"KGI Sekuritas Indonesia","HP":"Henan Putihrai Sekuritas","IC":"Integrity Capital Sekuritas","ID":"Anugerah Sekuritas Indonesia","IF":"Samuel Sekuritas Indonesia","IH":"Indo Harvest Sekuritas","II":"Danatama Makmur Sekuritas","IN":"Investindo Nusantara Sekuritas","IT":"Inti Teladan Sekuritas","IU":"Indo Capital Sekuritas","KI":"Ciptadana Sekuritas Asia","KK":"Phillip Sekuritas Indonesia","KZ":"CLSA Sekuritas Indonesia","LG":"Trimegah Sekuritas Indonesia Tbk.","LS":"Reliance Sekuritas Indonesia Tbk.","MG":"Semesta Indovest Sekuritas","MI":"Victoria Sekuritas Indonesia","MU":"Minna Padi Investama Sekuritas","NI":"BNI Sekuritas","OD":"BRI Danareksa Sekuritas","OK":"Net Sekuritas","PC":"FAC Sekuritas Indonesia","PD":"Indo Premier Sekuritas","PF":"Danasakti Sekuritas Indonesia","PG":"Panca Global Sekuritas","PI":"Magenta Kapital Sekuritas Indonesia","PO":"Pilarmas Investindo Sekuritas","PP":"Aldiracita Sekuritas Indonesia","QA":"Tuntun Sekuritas Indonesia","RB":"Ina Sekuritas Indonesia","RF":"Buana Capital Sekuritas","RG":"Profindo Sekuritas Indonesia","RO":"Pluang Maju Sekuritas","RS":"Yulie Sekuritas Indonesia Tbk.","RX":"Macquarie Sekuritas Indonesia","SA":"Elit Sukses Sekuritas","SF":"Surya Fajar Sekuritas","SH":"Artha Sekuritas Indonesia","SQ":"BCA Sekuritas","SS":"Supra Sekuritas Indonesia","TF":"Laba Sekuritas Indonesia","TP":"OCBC Sekuritas Indonesia","TS":"Dwidana Sakti Sekuritas","XA":"NH Korindo Sekuritas Indonesia","XC":"Ajaib Sekuritas Asia","XL":"Stockbit Sekuritas Digital","YB":"Yakin Bertumbuh Sekuritas","YJ":"Lotus Andalan Sekuritas","YO":"Amantara Sekuritas Indonesia","YP":"Mirae Asset Sekuritas Indonesia","YU":"CGS International Sekuritas Indonesia","ZP":"Maybank Sekuritas Indonesia","ZR":"Bumiputera Sekuritas"};
+    const retailBrokers = ["YP", "PD", "XC", "XL", "CC", "NI", "SQ", "EP", "KK", "OD", "GR", "CP", "DH", "AZ", "AT", "HP", "XA", "GI", "RO"];
+    const foreignBrokers = ["BK", "KZ", "AK", "RX", "YU", "ZP", "DP", "DR", "FS", "AI", "BQ", "AH", "AG"];
+    const instiLokalBrokers = ["DX", "LG", "IF", "BB", "RF", "LS", "KI", "TP", "PO", "PP", "AR", "CD", "DD"];
+    const mmBrokers = ["MG", "IN", "AO"];
+    let exportDataString = "";
+    let fetchTimeout = null;
+    const priceCache = {};
+
+    function filterTickerDropdown() {
+        const input = document.getElementById("stockTicker");
+        const dropdown = document.getElementById("tickerDropdown");
+        const q = input.value.trim().toUpperCase();
+        
+        let matches = [];
+        if (!q) {
+            matches = idxEntries.slice(0, 60);
+        } else {
+            const exactPrefix = idxEntries.filter(([code]) => code.startsWith(q));
+            const codeIncludes = idxEntries.filter(([code]) => !code.startsWith(q) && code.includes(q));
+            const nameIncludes = idxEntries.filter(([code, name]) => !code.includes(q) && name.toUpperCase().includes(q));
+            matches = [...exactPrefix, ...codeIncludes, ...nameIncludes].slice(0, 50);
+        }
+
+        if (matches.length === 0) {
+            dropdown.innerHTML = '<div class="ticker-dropdown-item"><span class="ticker-name">Kode tidak ditemukan (tetap bisa dipakai jika 4 huruf)</span></div>';
+        } else {
+            dropdown.innerHTML = matches.map(([code, name]) => `
+                <div class="ticker-dropdown-item" onmousedown="selectTicker('${code}')">
+                    <span class="ticker-code">${code}</span>
+                    <span class="ticker-name">${name}</span>
+                </div>
+            `).join("");
+        }
+        dropdown.style.display = "block";
+    }
+
+    function selectTicker(code) {
+        const input = document.getElementById("stockTicker");
+        const dropdown = document.getElementById("tickerDropdown");
+        const companyLabel = document.getElementById("selectedCompanyName");
+        
+        input.value = code;
+        dropdown.style.display = "none";
+        companyLabel.textContent = idxStocks[code] ? idxStocks[code] : "Emiten BEI (" + code + ")";
+        
+        clearTimeout(fetchTimeout);
+        fetchLiveStockPrice(code);
+    }
+
+    function onTickerInput() {
+        const input = document.getElementById("stockTicker");
+        input.value = input.value.toUpperCase();
+        const val = input.value.trim();
+        const companyLabel = document.getElementById("selectedCompanyName");
+        
+        filterTickerDropdown();
+        
+        if (idxStocks[val]) {
+            companyLabel.textContent = idxStocks[val];
+        } else if (val.length === 4) {
+            companyLabel.textContent = "Emiten BEI (" + val + ")";
+        } else {
+            companyLabel.textContent = "Semua saham BEI (AALI - ZYRX)";
+        }
+
+        clearTimeout(fetchTimeout);
+        if (val.length === 4 && /^[A-Z]{4}$/.test(val)) {
+            fetchTimeout = setTimeout(() => {
+                document.getElementById("tickerDropdown").style.display = "none";
+                fetchLiveStockPrice(val);
+            }, 350);
+        }
+    }
+
+    function manualRetryPrice() {
+        const val = document.getElementById("stockTicker").value.trim().toUpperCase();
+        if (val.length === 4) {
+            delete priceCache[val];
+            fetchLiveStockPrice(val);
+        } else {
+            alert("Masukkan 4 huruf kode saham terlebih dahulu (contoh: BBCA, ADRO, BBRI).");
+        }
+    }
+
+    function onManualPriceChange() {
+        autoUpdateThreshold();
+        const statusEl = document.getElementById("livePriceStatus");
+        const val = parseFloat(document.getElementById("avgPrice").value) || 0;
+        if (val > 0) {
+            statusEl.textContent = "✏️ Harga manual: Rp " + val.toLocaleString("id-ID");
+            statusEl.className = "live-status status-fallback";
+        }
+    }
+
+    document.addEventListener("click", function(e) {
+        const container = document.getElementById("tickerContainer");
+        if (container && !container.contains(e.target)) {
+            document.getElementById("tickerDropdown").style.display = "none";
+        }
+    });
+
+    function getBrokerInfo(brokerCode) {
+        if (retailBrokers.includes(brokerCode)) return { type: "Ritel Publik", class: "tag-ritel", isWhale: false, isRetail: true };
+        if (foreignBrokers.includes(brokerCode)) return { type: "Institusi Asing", class: "tag-asing", isWhale: true, isRetail: false };
+        if (instiLokalBrokers.includes(brokerCode)) return { type: "Institusi Lokal", class: "tag-lokal", isWhale: true, isRetail: false };
+        if (mmBrokers.includes(brokerCode)) return { type: "Market Maker", class: "tag-mm", isWhale: true, isRetail: false };
+        return { type: "Lainnya", class: "tag-unknown", isWhale: false, isRetail: false };
+    }
+
+    function autoUpdateThreshold() {
+        try {
+            const price = parseFloat(document.getElementById("avgPrice").value) || 0;
+            const tradeDays = parseInt(document.getElementById("tradeDays").value) || 1;
+            const thresholdInput = document.getElementById("thresholdValue");
+            const whaleInput = document.getElementById("whaleThreshold");
+            
+            let baseRitel = 1500000;
+            if (price >= 10000) baseRitel = 20000000;
+            else if (price >= 5000) baseRitel = 15000000;
+            else if (price >= 2000) baseRitel = 10000000;
+            else if (price >= 1000) baseRitel = 7500000;
+            else if (price >= 500) baseRitel = 5000000;
+            else if (price > 100) baseRitel = 2500000;
+            else baseRitel = 1500000;
+            
+            let timeMultiplier = 1;
+            if (tradeDays > 5) timeMultiplier = 0.6; 
+            else if (tradeDays > 1) timeMultiplier = 0.8;
+            
+            const finalRitel = Math.round(baseRitel * timeMultiplier);
+            const finalWhale = finalRitel * 10;
+            
+            thresholdInput.value = finalRitel;
+            whaleInput.value = finalWhale;
+            
+            document.getElementById("ritelHint").textContent = "Auto: " + formatBillion(finalRitel) + "/klik";
+            document.getElementById("hakaHint").textContent = "Auto: " + formatBillion(finalWhale) + "/klik";
+        } catch (err) { console.error(err); }
+    }
+
+    async function fetchWithTimeout(url, ms = 5000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), ms);
+        try {
+            const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+            clearTimeout(id);
+            return res;
+        } catch (e) {
+            clearTimeout(id);
+            throw e;
+        }
+    }
+
+    function applyFetchedPrice(ticker, price, prevClose, sourceLabel, extraMeta = {}) {
+        const priceInput = document.getElementById("avgPrice");
+        const changeInput = document.getElementById("priceChange");
+        const statusEl = document.getElementById("livePriceStatus");
+        
+        const roundedPrice = Math.round(price);
+        priceInput.value = roundedPrice;
+        let pctChange = 0;
+        if (prevClose && prevClose > 0) {
+            pctChange = ((price - prevClose) / prevClose) * 100;
+            changeInput.value = pctChange.toFixed(2);
+        }
+        const dayHigh = extraMeta.dayHigh || roundedPrice;
+        const dayLow = extraMeta.dayLow || roundedPrice;
+        const marketVolShares = extraMeta.volume || 0;
+        const marketVolLots = Math.round(marketVolShares / 100);
+
+        priceCache[ticker] = {
+            price: roundedPrice,
+            pctChange: pctChange.toFixed(2),
+            source: sourceLabel,
+            dayHigh,
+            dayLow,
+            marketVolLots
+        };
+        const badgeEl = document.getElementById("marketCapBadge");
+        if (badgeEl) {
+            badgeEl.textContent = `Vol Pasar: ${marketVolLots.toLocaleString("id-ID")} Lot | Range: Rp ${Math.round(dayLow).toLocaleString("id-ID")}-${Math.round(dayHigh).toLocaleString("id-ID")}`;
+        }
+        autoUpdateThreshold();
+        statusEl.textContent = "✅ " + sourceLabel + ": Rp " + roundedPrice.toLocaleString("id-ID");
+        statusEl.className = "live-status status-ok";
+    }
+
+    async function tryYahooJson(url, sourceLabel, ticker) {
+        const res = await fetchWithTimeout(url, 6000);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const text = await res.text();
+        let data = JSON.parse(text);
+        if (data && data.contents) {
+            data = JSON.parse(data.contents);
+        }
+        const meta = data?.chart?.result?.[0]?.meta;
+        const livePrice = meta?.regularMarketPrice;
+        const prevClose = meta?.chartPreviousClose || meta?.previousClose;
+        if (livePrice && livePrice > 0) {
+            applyFetchedPrice(ticker, livePrice, prevClose, sourceLabel, {
+                dayHigh: meta?.regularMarketDayHigh || livePrice,
+                dayLow: meta?.regularMarketDayLow || livePrice,
+                volume: meta?.regularMarketVolume || 0
+            });
+            return true;
+        }
+        throw new Error("Invalid Yahoo payload");
+    }
+
+    async function tryGoogleFinance(proxyUrl, sourceLabel, ticker) {
+        const res = await fetchWithTimeout(proxyUrl, 6500);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        let htmlText = await res.text();
+        if (htmlText.startsWith("{")) {
+            try {
+                const wrapped = JSON.parse(htmlText);
+                if (wrapped.contents) htmlText = wrapped.contents;
+            } catch (e) {}
+        }
+        // Google Finance embeds data-last-price="XXXX" and data-previous-close="XXXX"
+        const priceMatch = htmlText.match(/data-last-price="([0-9.,]+)"/i);
+        const prevMatch = htmlText.match(/data-previous-close="([0-9.,]+)"/i);
+        if (priceMatch && priceMatch[1]) {
+            const livePrice = parseFloat(priceMatch[1].replace(/,/g, ""));
+            const prevClose = prevMatch && prevMatch[1] ? parseFloat(prevMatch[1].replace(/,/g, "")) : livePrice;
+            if (!isNaN(livePrice) && livePrice > 0) {
+                applyFetchedPrice(ticker, livePrice, prevClose, sourceLabel);
+                return true;
+            }
+        }
+        throw new Error("Google Finance price tag not found");
+    }
+
+    async function tryStooqCsv(url, sourceLabel, ticker) {
+        const res = await fetchWithTimeout(url, 6000);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        let text = await res.text();
+        if (text.startsWith("{")) {
+            const wrapped = JSON.parse(text);
+            if (wrapped.contents) text = wrapped.contents;
+        }
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length >= 2) {
+            const cols = lines[1].split(",");
+            const openPrice = parseFloat(cols[3]);
+            const closePrice = parseFloat(cols[6]);
+            if (!isNaN(closePrice) && closePrice > 0) {
+                applyFetchedPrice(ticker, closePrice, !isNaN(openPrice) ? openPrice : closePrice, sourceLabel);
+                return true;
+            }
+        }
+        throw new Error("Invalid Stooq CSV");
+    }
+
+    async function fetchLiveStockPrice(ticker) {
+        const statusEl = document.getElementById("livePriceStatus");
+        const priceInput = document.getElementById("avgPrice");
+        const changeInput = document.getElementById("priceChange");
+        
+        if (priceCache[ticker]) {
+            priceInput.value = priceCache[ticker].price;
+            changeInput.value = priceCache[ticker].pctChange;
+            autoUpdateThreshold();
+            statusEl.textContent = "✅ " + priceCache[ticker].source + ": Rp " + priceCache[ticker].price.toLocaleString("id-ID");
+            statusEl.className = "live-status status-ok";
+            return;
+        }
+
+        statusEl.textContent = "⏳ Menarik harga live " + ticker + "...";
+        statusEl.className = "live-status status-fetching";
+        
+        const gfUrl = "https://www.google.com/finance/quote/" + ticker + ":IDX";
+        const y1 = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker + ".JK?interval=1d&range=2d";
+        const y2 = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker + ".JK?interval=1d&range=2d";
+        const stooqUrl = "https://stooq.com/q/l/?s=" + ticker.toLowerCase() + ".jk&f=sd2t2ohlcv&h&e=csv";
+
+        const attempts = [
+            () => tryGoogleFinance("https://api.allorigins.win/raw?url=" + encodeURIComponent(gfUrl), "Google Finance", ticker),
+            () => tryGoogleFinance("https://corsproxy.io/?" + encodeURIComponent(gfUrl), "Google Finance", ticker),
+            () => tryGoogleFinance("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(gfUrl), "Google Finance", ticker),
+            () => tryYahooJson("https://api.allorigins.win/raw?url=" + encodeURIComponent(y1), "Live IDX", ticker),
+            () => tryYahooJson("https://corsproxy.io/?" + encodeURIComponent(y2), "Live IDX", ticker),
+            () => tryYahooJson("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(y1), "Live IDX", ticker),
+            () => tryStooqCsv("https://api.allorigins.win/raw?url=" + encodeURIComponent(stooqUrl), "Market Feed", ticker)
+        ];
+
+        try {
+            await Promise.any(attempts.map(fn => fn()));
+            return;
+        } catch (aggErr) {
+            console.warn("Semua jalur live price gagal/diblokir:", aggErr);
+        }
+        
+        const estPrice = estimatePriceFromPastedData();
+        if (estPrice > 0) {
+            priceInput.value = estPrice;
+            autoUpdateThreshold();
+            statusEl.textContent = "⚡ Est. B.Avg Broksum: Rp " + estPrice.toLocaleString("id-ID");
+            statusEl.className = "live-status status-fallback";
+        } else {
+            statusEl.textContent = "⚠️ Paste broksum / isi harga manual";
+            statusEl.className = "live-status status-fetching";
+        }
+    }
+
+    function estimatePriceFromPastedData() {
+        const buyText = document.getElementById("buyInput").value.trim();
+        const sellText = document.getElementById("sellInput").value.trim();
+        const buyData = processTextarea(buyText);
+        const sellData = processTextarea(sellText);
+        let prices = [];
+        Object.values(buyData).forEach(x => { if(x.avgTradePrice > 0) prices.push(x.avgTradePrice); });
+        Object.values(sellData).forEach(x => { if(x.avgTradePrice > 0) prices.push(x.avgTradePrice); });
+        if (prices.length > 0) {
+            const sum = prices.reduce((a, b) => a + b, 0);
+            return Math.round(sum / prices.length);
+        }
+        return 0;
+    }
+
+    function smartExtractFromPaste() {
+        const statusEl = document.getElementById("livePriceStatus");
+        if (!statusEl.textContent.includes("✅")) {
+            const estPrice = estimatePriceFromPastedData();
+            if (estPrice > 0) {
+                document.getElementById("avgPrice").value = estPrice;
+                autoUpdateThreshold();
+                statusEl.textContent = "⚡ Auto-deteksi B.Avg: Rp " + estPrice.toLocaleString("id-ID");
+                statusEl.className = "live-status status-fallback";
+            }
+        }
+    }
+
+    function formatRupiah(number) { return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(number); }
+    function formatBillion(number) { 
+        let abs = Math.abs(number);
+        if(abs >= 1000000000) return (number/1000000000).toFixed(2) + " Miliar";
+        if(abs >= 1000000) return (number/1000000).toFixed(2) + " Juta";
+        return formatRupiah(number);
+    }
+    function parseCustomNumber(str) {
+        if (!str) return 0;
+        let s = str.toString().toUpperCase().trim();
+        let multiplier = 1;
+        if (s.includes("K")) { multiplier = 1000; s = s.replace("K", ""); }
+        else if (s.includes("M")) { multiplier = 1000000; s = s.replace("M", ""); }
+        else if (s.includes("B")) { multiplier = 1000000000; s = s.replace("B", ""); }
+        
+        s = s.replace(/\s/g, "");
+        let lastComma = s.lastIndexOf(",");
+        let lastDot = s.lastIndexOf(".");
+        
+        if (lastComma > lastDot && lastDot !== -1) {
+            s = s.replace(/\./g, "");
+            s = s.replace(",", ".");
+        } else if (lastDot > lastComma && lastComma !== -1) {
+            s = s.replace(/,/g, "");
+        } else if (lastDot !== -1 && lastComma === -1) {
+            let parts = s.split(".");
+            if (parts[parts.length - 1].length === 3) {
+                s = s.replace(/\./g, "");
+            }
+        } else if (lastComma !== -1 && lastDot === -1) {
+            let parts = s.split(",");
+            if (parts[parts.length - 1].length === 3) {
+                s = s.replace(/,/g, "");
+            } else {
+                s = s.replace(",", ".");
+            }
+        }
+        
+        let num = parseFloat(s.replace(/[^0-9.-]+/g, ""));
+        if (isNaN(num)) return 0;
+        return num * multiplier;
+    }
+    function processTextarea(text) {
+        const lines = text.split(/\r?\n/);
+        let parsedData = {};
+        lines.forEach(line => {
+            let cols = line.trim().split(/\t+|\s{2,}/);
+            if (cols.length >= 4) {
+                const broker = cols[0].trim().toUpperCase();
+                if (broker === "BY" || broker === "SL" || broker === "BROKER" || broker === "") return;
+                
+                const val = parseCustomNumber(cols[1]);
+                const lot = parseCustomNumber(cols[2]);
+                const freq = parseCustomNumber(cols[3]);
+                let avgTradePrice = 0;
+                if(cols.length >= 5) avgTradePrice = parseCustomNumber(cols[4]);
+                
+                if (freq > 0 || lot > 0) parsedData[broker] = { val, lot, freq, avgTradePrice };
+            }
+        });
+        return parsedData;
+    }
+
+    // === V37.0 IDX TICK RULES, BANDAR PAIN CALCULATOR & ASYMMETRIC POSITION SIZER ===
+    let batchRadarItems = [];
+
+    function getIdxTick(price) {
+        if (price < 200) return 1;
+        if (price < 500) return 2;
+        if (price < 2000) return 5;
+        if (price < 5000) return 10;
+        return 25;
+    }
+
+    function roundToIdxTick(rawPrice) {
+        if (!rawPrice || rawPrice <= 0) return 1;
+        const p = Math.round(rawPrice);
+        const tick = getIdxTick(p);
+        return Math.max(1, Math.round(p / tick) * tick);
+    }
+
+    function onRdnCapitalChange() {
+        const val = parseFloat(document.getElementById("rdnCapital").value) || 0;
+        localStorage.setItem("whalexray_rdn_capital", String(val));
+        const hintEl = document.getElementById("rdnHint");
+        if (hintEl) hintEl.textContent = formatBillion(val) + " (Auto-simpan)";
+        if (document.getElementById("resultCard").style.display === "block") {
+            scanData();
+        }
+    }
+
+    function loadSavedRdnCapital() {
+        const saved = localStorage.getItem("whalexray_rdn_capital");
+        const input = document.getElementById("rdnCapital");
+        if (saved && input) {
+            input.value = saved;
+        }
+        const val = parseFloat(input?.value) || 10000000;
+        const hintEl = document.getElementById("rdnHint");
+        if (hintEl) hintEl.textContent = formatBillion(val) + " (Auto-simpan)";
+    }
+
+    function computeQuantPlan(params) {
+        const { results, currentPrice, institutionalScore, hhiBuy, isAbsorption, isStealth, crossingWarning, rdnCapital } = params;
+
+        // 1. Identify Top Controlling Buyers for Bandar VWAP
+        const netBuyers = results.filter(r => r.isBuyer && r.netLot > 0);
+        const whaleBuyers = netBuyers.filter(r => r.brokerData.isWhale);
+        const controllers = (whaleBuyers.length > 0 ? whaleBuyers : netBuyers).slice(0, 3);
+
+        let weightedValSum = 0;
+        let weightedLotSum = 0;
+        controllers.forEach(c => {
+            const p = c.brokerAvgPrice > 0 ? c.brokerAvgPrice : (c.netLot > 0 ? Math.abs(c.exactNetCash) / (c.netLot * 100) : currentPrice);
+            if (p > 0 && c.netLot > 0) {
+                weightedValSum += p * c.netLot;
+                weightedLotSum += c.netLot;
+            }
+        });
+
+        const rawVwap = weightedLotSum > 0 ? (weightedValSum / weightedLotSum) : currentPrice;
+        const bandarVwap = roundToIdxTick(rawVwap > 0 ? rawVwap : currentPrice);
+        const refPrice = currentPrice > 0 ? currentPrice : bandarVwap;
+        const floatingPct = bandarVwap > 0 ? ((refPrice - bandarVwap) / bandarVwap) * 100 : 0;
+
+        // 2. Classify Bandar Pain Zone
+        let zoneLabel = "NETRAL / BELUM TERDETEKSI";
+        let zoneColor = "var(--text-muted)";
+        let zoneBg = "rgba(148, 163, 184, 0.15)";
+        let painNarrative = "Belum ada dominasi broker pengendali yang cukup kuat untuk menghitung titik impas bandar.";
+
+        if (weightedLotSum > 0 && bandarVwap > 0) {
+            if (floatingPct <= -1.5) {
+                zoneLabel = "🟢 ZONA BANDAR TERJEPIT (" + floatingPct.toFixed(1) + "%)";
+                zoneColor = "var(--success)";
+                zoneBg = "var(--success-bg)";
+                painNarrative = "Harga saat ini berada " + Math.abs(floatingPct).toFixed(1) + "% DI BAWAH rata-rata modal pengendali (" + controllers.map(c => c.broker).join(", ") + " @ Rp " + bandarVwap.toLocaleString("id-ID") + "). Bandar sedang menahan benteng support / averaging.";
+            } else if (floatingPct <= 3.5) {
+                zoneLabel = "🚀 SWEET SPOT: BANDAR BARU MASUK (+" + Math.max(0, floatingPct).toFixed(1) + "%)";
+                zoneColor = "var(--success)";
+                zoneBg = "var(--success-bg)";
+                painNarrative = "Harga sangat rapat dengan modal pengendali (" + controllers.map(c => c.broker).join(", ") + " @ Rp " + bandarVwap.toLocaleString("id-ID") + "). Bandar belum punya ruang profit untuk distribusi — probabilitas mark-up +8% s.d. +15% sangat tinggi.";
+            } else if (floatingPct <= 12.0) {
+                zoneLabel = "🟡 FASE MARK-UP BERJALAN (+" + floatingPct.toFixed(1) + "%)";
+                zoneColor = "var(--warning)";
+                zoneBg = "var(--warning-bg)";
+                painNarrative = "Pengendali sudah mengantongi floating profit +" + floatingPct.toFixed(1) + "% di atas modal VWAP (Rp " + bandarVwap.toLocaleString("id-ID") + "). Masih layak kawal selama HHI kuat, namun disiplin pasang trailing stop.";
+            } else {
+                zoneLabel = "🔴 ZONA RAWAN GUYUR (+" + floatingPct.toFixed(1) + "%)";
+                zoneColor = "var(--danger)";
+                zoneBg = "var(--danger-bg)";
+                painNarrative = "PERINGATAN EXIT LIQUIDITY: Pengendali sudah untung +" + floatingPct.toFixed(1) + "% dari modal (Rp " + bandarVwap.toLocaleString("id-ID") + "). Sangat rawan HAKI / guyuran ke ritel yang FOMO di pucuk.";
+            }
+        }
+
+        // 3. Calculate Valid IDX Tick Levels
+        const tick = getIdxTick(bandarVwap);
+        const idealEntryLow = roundToIdxTick(bandarVwap - tick);
+        const idealEntryHigh = roundToIdxTick(bandarVwap + (2 * tick));
+        const targetTp1 = roundToIdxTick(bandarVwap * 1.08);
+        const targetTp2 = roundToIdxTick(bandarVwap * 1.15);
+        const hardCutLoss = Math.max(1, bandarVwap - (3 * getIdxTick(bandarVwap)));
+
+        const entryBasis = refPrice > 0 ? refPrice : bandarVwap;
+        const clRiskPct = entryBasis > 0 ? Math.max(0, ((entryBasis - hardCutLoss) / entryBasis) * 100) : 0;
+
+        // 4. Asymmetric RDN Position Sizer
+        let grade = "GRADE C — CASH IS KING";
+        let gradeShort = "GRADE C";
+        let allocPct = 0;
+        let gradeColor = "var(--text-muted)";
+        let gradeBg = "rgba(148, 163, 184, 0.12)";
+        let rationale = "Sinyal netral, distribusi, atau harga sudah lari terlalu jauh di atas modal bandar. Simpan cash untuk peluang Grade A.";
+
+        if (floatingPct > 12.0 || institutionalScore <= -2) {
+            grade = "GRADE C / TRAP — SKIP (0%)";
+            gradeShort = "SKIP";
+            allocPct = 0;
+            gradeColor = "var(--danger)";
+            gradeBg = "var(--danger-bg)";
+            rationale = floatingPct > 12.0
+                ? "Harga sudah lari +" + floatingPct.toFixed(1) + "% di atas modal bandar. Risiko diguyur jauh lebih besar daripada potensi naik."
+                : "Terdeteksi distribusi / tekanan jual institusi. Dilarang entry melawan arus uang besar.";
+        } else if ((institutionalScore >= 5 || isAbsorption || isStealth) && floatingPct <= 4.0 && !crossingWarning) {
+            grade = "GRADE A+ — ASYMMETRIC CONVICTION";
+            gradeShort = "GRADE A+";
+            allocPct = 35;
+            gradeColor = "var(--success)";
+            gradeBg = "var(--success-bg)";
+            rationale = "Setup terbaik: Akumulasi institusi ekstrem + harga masih di zona modal bandar (risiko cut loss ketat, potensi mark-up lebar).";
+        } else if (institutionalScore >= 4 && floatingPct <= 8.5 && !crossingWarning) {
+            grade = "GRADE A — HIGH CONVICTION";
+            gradeShort = "GRADE A";
+            allocPct = 25;
+            gradeColor = "var(--info)";
+            gradeBg = "var(--info-bg)";
+            rationale = "Dominasi beli institusi terkonfirmasi dan jarak dari VWAP bandar masih terkendali.";
+        } else if (institutionalScore >= 2 && floatingPct <= 12.0) {
+            grade = "GRADE B — TESTING POSITION";
+            gradeShort = "GRADE B";
+            allocPct = 12;
+            gradeColor = "var(--warning)";
+            gradeBg = "var(--warning-bg)";
+            rationale = crossingWarning
+                ? "Terdeteksi crossing/estafet antar bandar. Masuk porsi kecil dulu sambil menunggu konfirmasi arah sopir baru."
+                : "Akumulasi awal terdeteksi. Gunakan porsi testing (12% RDN) dan tambah posisi hanya jika breakout dengan volume.";
+        }
+
+        const allocRupiah = Math.round(rdnCapital * (allocPct / 100));
+        const lots = entryBasis > 0 ? Math.floor(allocRupiah / (entryBasis * 100)) : 0;
+        const actualDeployedRp = lots * entryBasis * 100;
+        const maxLossRp = lots > 0 && entryBasis > hardCutLoss ? Math.round(lots * 100 * (entryBasis - hardCutLoss)) : 0;
+        const rdnRiskPct = rdnCapital > 0 ? (maxLossRp / rdnCapital) * 100 : 0;
+
+        return {
+            bandarVwap,
+            floatingPct,
+            zoneLabel,
+            zoneColor,
+            zoneBg,
+            painNarrative,
+            idealEntryLow,
+            idealEntryHigh,
+            targetTp1,
+            targetTp2,
+            hardCutLoss,
+            clRiskPct,
+            grade,
+            gradeShort,
+            allocPct,
+            gradeColor,
+            gradeBg,
+            rationale,
+            allocRupiah,
+            lots,
+            actualDeployedRp,
+            maxLossRp,
+            rdnRiskPct,
+            controllers: controllers.map(c => c.broker).join(", ") || "-"
+        };
+    }
+
+    function renderQuantCards(q, rdnCapital) {
+        const zonePill = document.getElementById("bandarZonePill");
+        zonePill.textContent = q.zoneLabel;
+        zonePill.style.color = q.zoneColor;
+        zonePill.style.backgroundColor = q.zoneBg;
+
+        document.getElementById("bandarPainNarrative").textContent = q.painNarrative;
+        document.getElementById("lvlBandarVwap").textContent = formatRupiah(q.bandarVwap);
+        document.getElementById("lvlFloatingSub").textContent = "Floating: " + (q.floatingPct >= 0 ? "+" : "") + q.floatingPct.toFixed(1) + "% (" + q.controllers + ")";
+        document.getElementById("lvlIdealEntry").textContent = "Rp " + q.idealEntryLow.toLocaleString("id-ID") + " - " + q.idealEntryHigh.toLocaleString("id-ID");
+        document.getElementById("lvlTargetMarkup").textContent = formatRupiah(q.targetTp1);
+        document.getElementById("lvlTargetSub").textContent = "TP2 (+15%): " + formatRupiah(q.targetTp2);
+        document.getElementById("lvlHardCl").textContent = formatRupiah(q.hardCutLoss);
+        document.getElementById("lvlClRiskSub").textContent = "Jarak CL: -" + q.clRiskPct.toFixed(1) + "%";
+
+        document.getElementById("sizerRdnLabel").textContent = "RDN: " + formatBillion(rdnCapital);
+        const banner = document.getElementById("setupGradeBanner");
+        banner.style.color = q.gradeColor;
+        banner.style.backgroundColor = q.gradeBg;
+        banner.style.borderColor = q.gradeColor;
+        document.getElementById("setupGradeTitle").textContent = q.grade;
+        document.getElementById("setupAllocPct").textContent = q.allocPct + "% RDN";
+        document.getElementById("sizerRationale").textContent = q.rationale;
+        document.getElementById("sizerAllocRp").textContent = formatBillion(q.allocRupiah);
+        document.getElementById("sizerLots").textContent = q.lots.toLocaleString("id-ID") + " Lot";
+        document.getElementById("sizerLotPriceSub").textContent = q.lots > 0 ? ("Nilai: " + formatBillion(q.actualDeployedRp)) : "Tidak ada order";
+        document.getElementById("sizerMaxLoss").textContent = formatRupiah(q.maxLossRp);
+        document.getElementById("sizerRdnRiskPct").textContent = q.rdnRiskPct.toFixed(2) + "% dari total RDN";
+    }
+
+    function toggleEmbeddedTvChart() {
+        const box = document.getElementById("tvEmbedBox");
+        if (!box) return;
+        if (box.style.display === "block") {
+            box.style.display = "none";
+            box.innerHTML = "";
+            return;
+        }
+        const ticker = document.getElementById("stockTicker").value.trim().toUpperCase() || "IHSG";
+        const tvSym = ticker === "IHSG" ? "IDX:COMPOSITE" : "IDX:" + ticker;
+        box.style.display = "block";
+        box.innerHTML = '<iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_chart&symbol=' + encodeURIComponent(tvSym) + '&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=0f172a&studies=MASimple%40tv-basicstudies&theme=dark&style=1&timezone=Asia%2FJakarta&withdateranges=1&showpopupbutton=1&locale=id" style="width:100%; height:420px; border:0;"></iframe>';
+    }
+
+    // === BATCH BSJP RADAR FUNCTIONS ===
+    function analyzeStockSnapshot(item) {
+        const ticker = (item.ticker || "IDX").toUpperCase();
+        const companyName = idxStocks[ticker] || "Bursa Efek Indonesia";
+        const buyText = item.buyText || "";
+        const sellText = item.sellText || "";
+        const tradeDays = parseInt(item.days || document.getElementById("tradeDays").value) || 1;
+        const priceChange = parseFloat(item.chg || 0) || 0;
+        const rdnCapital = parseFloat(document.getElementById("rdnCapital").value) || 10000000;
+
+        const buyData = processTextarea(buyText);
+        const sellData = processTextarea(sellText);
+
+        let estPrice = parseFloat(item.price) || 0;
+        if (estPrice <= 0) {
+            let prices = [];
+            Object.values(buyData).forEach(x => { if (x.avgTradePrice > 0) prices.push(x.avgTradePrice); });
+            Object.values(sellData).forEach(x => { if (x.avgTradePrice > 0) prices.push(x.avgTradePrice); });
+            if (prices.length > 0) estPrice = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+        }
+
+        // Dynamic thresholds based on price
+        let baseRitel = 1500000;
+        if (estPrice >= 10000) baseRitel = 20000000;
+        else if (estPrice >= 5000) baseRitel = 15000000;
+        else if (estPrice >= 2000) baseRitel = 10000000;
+        else if (estPrice >= 1000) baseRitel = 7500000;
+        else if (estPrice >= 500) baseRitel = 5000000;
+        else if (estPrice > 100) baseRitel = 2500000;
+        const thresholdValue = Math.round(baseRitel * (tradeDays > 5 ? 0.6 : (tradeDays > 1 ? 0.8 : 1)));
+        const whaleThreshold = thresholdValue * 10;
+
+        const allBrokers = new Set([...Object.keys(buyData), ...Object.keys(sellData)]);
+        let netCashSum = 0;
+        let institutionalScore = 0;
+        let totalBuyLot = 0;
+        let buyLotsArray = [];
+        let results = [];
+
+        allBrokers.forEach(broker => {
+            const b = buyData[broker] || { val: 0, lot: 0, freq: 0, avgTradePrice: 0 };
+            const s = sellData[broker] || { val: 0, lot: 0, freq: 0, avgTradePrice: 0 };
+            const netLot = b.lot - s.lot;
+            const exactNetCash = b.val - s.val;
+            if (netLot === 0) return;
+            if (netLot > 0) {
+                totalBuyLot += netLot;
+                buyLotsArray.push({ lot: netLot, broker });
+            }
+            netCashSum += exactNetCash;
+
+            const isBuyer = netLot > 0;
+            const avgValue = isBuyer ? (b.freq > 0 ? b.val / b.freq : 0) : (s.freq > 0 ? s.val / s.freq : 0);
+            const brokerAvgPrice = isBuyer ? b.avgTradePrice : s.avgTradePrice;
+            const brokerData = getBrokerInfo(broker);
+            const isFakeRetail = (brokerData.isRetail && avgValue > thresholdValue);
+            if (isFakeRetail) brokerData.isWhale = true;
+
+            if (brokerData.isRetail && !isFakeRetail) {
+                institutionalScore += isBuyer ? -1 : 1;
+            } else {
+                let score = 2;
+                if (avgValue > whaleThreshold) score = 4;
+                else if (avgValue > thresholdValue) score = 3;
+                institutionalScore += isBuyer ? score : -score;
+            }
+            results.push({ broker, brokerData, netLot, exactNetCash, avgValue, isBuyer, brokerAvgPrice });
+        });
+
+        let hhiBuy = 0;
+        if (totalBuyLot > 0) {
+            hhiBuy = buyLotsArray.reduce((sum, it) => sum + Math.pow((it.lot / totalBuyLot) * 100, 2), 0);
+        }
+        if (tradeDays > 1) {
+            if (hhiBuy >= 2500) institutionalScore += 4;
+            else if (hhiBuy >= 1500) institutionalScore += 2;
+        }
+
+        results.sort((a, b) => b.netLot - a.netLot);
+        const topBuyer = results.find(r => r.isBuyer);
+        const topSeller = results.slice().reverse().find(r => !r.isBuyer);
+
+        let crossingWarning = false;
+        let isAbsorption = false;
+        let isStealth = false;
+        if (topBuyer && topSeller && topBuyer.brokerData.isWhale && topSeller.brokerData.isWhale) {
+            const ratio = Math.abs(topBuyer.netLot) / Math.abs(topSeller.netLot);
+            if (ratio >= 0.8 && ratio <= 1.25 && Math.abs(topBuyer.netLot) > (totalBuyLot * 0.15)) crossingWarning = true;
+        }
+        if (topBuyer && topSeller && !topSeller.brokerData.isWhale && topBuyer.brokerData.isWhale) {
+            if (priceChange <= 0 && topBuyer.netLot >= (totalBuyLot * 0.2)) isAbsorption = true;
+        }
+        if (!isAbsorption && topBuyer && topBuyer.brokerData.isWhale && institutionalScore >= 4 && priceChange <= 1) {
+            if (tradeDays > 1 && hhiBuy > 1500) isStealth = true;
+        }
+
+        const quant = computeQuantPlan({
+            results,
+            currentPrice: estPrice,
+            institutionalScore,
+            hhiBuy,
+            isAbsorption,
+            isStealth,
+            crossingWarning,
+            rdnCapital
+        });
+
+        return {
+            ticker,
+            companyName,
+            price: estPrice,
+            chg: priceChange,
+            days: tradeDays,
+            buyText,
+            sellText,
+            score: institutionalScore,
+            hhi: Math.round(hhiBuy),
+            netCash: netCashSum,
+            quant
+        };
+    }
+
+    function gradePriority(gradeShort) {
+        if (gradeShort === "GRADE A+") return 4;
+        if (gradeShort === "GRADE A") return 3;
+        if (gradeShort === "GRADE B") return 2;
+        return 1;
+    }
+
+    function renderBatchRadar() {
+        const card = document.getElementById("batchRadarCard");
+        const tbody = document.getElementById("batchRadarBody");
+        if (!card || !tbody) return;
+
+        if (batchRadarItems.length === 0) {
+            card.style.display = "none";
+            return;
+        }
+
+        batchRadarItems.sort((a, b) => {
+            const gp = gradePriority(b.quant.gradeShort) - gradePriority(a.quant.gradeShort);
+            if (gp !== 0) return gp;
+            if (b.score !== a.score) return b.score - a.score;
+            return b.netCash - a.netCash;
+        });
+
+        card.style.display = "block";
+        document.getElementById("batchRadarSummary").textContent =
+            "Menampilkan " + batchRadarItems.length + " emiten tersaring • Diurutkan otomatis berdasarkan Grade Setup, Skor Bandar, & Net Cash";
+
+        tbody.innerHTML = batchRadarItems.map((it, idx) => {
+            const q = it.quant;
+            return `
+                <tr>
+                    <td style="font-weight:900; color:${idx === 0 ? 'var(--warning)' : 'var(--text-muted)'}; font-size:1rem;">#${idx + 1}</td>
+                    <td>
+                        <strong style="color:var(--info); font-size:1rem;">${it.ticker}</strong><br>
+                        <span style="font-family:monospace; font-size:0.78rem;">Rp ${it.price.toLocaleString("id-ID")} (${it.chg >= 0 ? "+" : ""}${it.chg.toFixed(2)}%)</span>
+                    </td>
+                    <td>
+                        <span class="badge" style="background:${q.gradeBg}; color:${q.gradeColor}; border:1px solid ${q.gradeColor};">${q.gradeShort}</span><br>
+                        <span style="font-size:0.7rem; color:${q.zoneColor};">${q.zoneLabel}</span>
+                    </td>
+                    <td style="font-family:monospace;">
+                        <strong style="color:${it.score >= 4 ? 'var(--success)' : (it.score < 0 ? 'var(--danger)' : 'var(--warning)')};">${it.score > 0 ? "+" + it.score : it.score}</strong><br>
+                        <span style="font-size:0.72rem; color:var(--text-muted);">HHI: ${it.hhi.toLocaleString("id-ID")}</span>
+                    </td>
+                    <td style="font-weight:bold; color:${it.netCash >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                        ${it.netCash >= 0 ? "+" : ""}${formatBillion(it.netCash)}
+                    </td>
+                    <td style="font-family:monospace;">
+                        Rp ${q.bandarVwap.toLocaleString("id-ID")}<br>
+                        <span style="font-size:0.72rem; color:${q.floatingPct <= 3.5 ? 'var(--success)' : 'var(--warning)'};">(${q.floatingPct >= 0 ? "+" : ""}${q.floatingPct.toFixed(1)}%)</span>
+                    </td>
+                    <td style="font-family:monospace; font-size:0.76rem;">
+                        <span style="color:var(--warning);">TP1: Rp ${q.targetTp1.toLocaleString("id-ID")}</span><br>
+                        <span style="color:var(--danger);">CL: Rp ${q.hardCutLoss.toLocaleString("id-ID")}</span>
+                    </td>
+                    <td style="font-family:monospace;">
+                        <strong style="color:var(--success);">${q.allocPct}% (${q.lots.toLocaleString("id-ID")} Lot)</strong><br>
+                        <span style="font-size:0.7rem; color:var(--text-muted);">${formatBillion(q.allocRupiah)}</span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-mini" onclick="inspectBatchItem('${it.ticker}')">🔍 Bedah</button>
+                        <button type="button" class="btn-mini" style="border-color:var(--danger); color:var(--danger); background:transparent; margin-left:3px;" onclick="removeBatchItem('${it.ticker}')">✕</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    function upsertBatchItem(snapshot) {
+        const idx = batchRadarItems.findIndex(x => x.ticker === snapshot.ticker);
+        if (idx >= 0) batchRadarItems[idx] = snapshot;
+        else batchRadarItems.push(snapshot);
+    }
+
+    function addCurrentToBatchRadar() {
+        const ticker = document.getElementById("stockTicker").value.trim().toUpperCase() || "IDX";
+        const buyText = document.getElementById("buyInput").value.trim();
+        const sellText = document.getElementById("sellInput").value.trim();
+        if (!buyText && !sellText) {
+            alert("Data Broker Summary masih kosong.");
+            return;
+        }
+        const snap = analyzeStockSnapshot({
+            ticker,
+            price: parseFloat(document.getElementById("avgPrice").value) || 0,
+            chg: parseFloat(document.getElementById("priceChange").value) || 0,
+            days: parseInt(document.getElementById("tradeDays").value) || 1,
+            buyText,
+            sellText
+        });
+        upsertBatchItem(snap);
+        renderBatchRadar();
+        document.getElementById("batchRadarCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function inspectBatchItem(ticker) {
+        const item = batchRadarItems.find(x => x.ticker === ticker);
+        if (!item) return;
+        document.getElementById("stockTicker").value = item.ticker;
+        onTickerInput();
+        if (item.price > 0) document.getElementById("avgPrice").value = item.price;
+        document.getElementById("priceChange").value = item.chg;
+        document.getElementById("tradeDays").value = item.days;
+        document.getElementById("buyInput").value = item.buyText;
+        document.getElementById("sellInput").value = item.sellText;
+        autoUpdateThreshold();
+        scanData();
+        document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function removeBatchItem(ticker) {
+        batchRadarItems = batchRadarItems.filter(x => x.ticker !== ticker);
+        renderBatchRadar();
+    }
+
+    function clearBatchRadar() {
+        batchRadarItems = [];
+        renderBatchRadar();
+    }
+
+    function copyBatchSummary() {
+        if (batchRadarItems.length === 0) return;
+        const lines = batchRadarItems.map((it, i) =>
+            `#${i + 1} ${it.ticker} | ${it.quant.gradeShort} | Skor: ${it.score} | Net: ${formatBillion(it.netCash)} | VWAP Bandar: Rp ${it.quant.bandarVwap} | TP1: Rp ${it.quant.targetTp1} | CL: Rp ${it.quant.hardCutLoss} | Order: ${it.quant.lots} Lot`
+        );
+        navigator.clipboard.writeText("--- WHALEX-RAY V37.1 BATCH BSJP RADAR ---\n" + lines.join("\n")).then(() => {
+            alert("✅ Peringkat Batch BSJP berhasil disalin ke Clipboard!");
+        });
+    }
+
+    function ingestBatchPayload(payloadList) {
+        if (!Array.isArray(payloadList) || payloadList.length === 0) return;
+        payloadList.forEach(raw => {
+            const snap = analyzeStockSnapshot(raw);
+            upsertBatchItem(snap);
+        });
+        renderBatchRadar();
+        // Automatically load the #1 top-ranked stock into the detailed analyzer below
+        if (batchRadarItems.length > 0) {
+            inspectBatchItem(batchRadarItems[0].ticker);
+        }
+    }
+
+    function scanData() {
+        try {
+            const tickerInput = document.getElementById("stockTicker").value.trim().toUpperCase();
+            const tickerLabel = tickerInput ? tickerInput : "SAHAM IHSG";
+            const companyName = idxStocks[tickerInput] ? idxStocks[tickerInput] : "Bursa Efek Indonesia";
+            const buyText = document.getElementById("buyInput").value.trim();
+            const sellText = document.getElementById("sellInput").value.trim();
+            const currentPrice = parseFloat(document.getElementById("avgPrice").value) || 0;
+            const thresholdValue = parseFloat(document.getElementById("thresholdValue").value) || 5000000;
+            const whaleThreshold = parseFloat(document.getElementById("whaleThreshold").value) || (thresholdValue * 10);
+            const tradeDays = parseInt(document.getElementById("tradeDays").value) || 1;
+            const priceChange = parseFloat(document.getElementById("priceChange").value) || 0;
+            
+            const tbody = document.getElementById("resultBody");
+            if (!buyText && !sellText) { alert("Data kosong. Copy paste tabel broksum terlebih dahulu."); return; }
+            tbody.innerHTML = "";
+            
+            document.getElementById("bannerTicker").textContent = "EMITEN: " + tickerLabel;
+            document.getElementById("bannerCompany").textContent = companyName;
+            document.getElementById("bannerMeta").textContent = "Harga: " + formatRupiah(currentPrice) + " | Periode: " + tradeDays + " Hari (" + (priceChange >= 0 ? "+" : "") + priceChange + "%)";
+            
+            const buyData = processTextarea(buyText);
+            const sellData = processTextarea(sellText);
+            
+            let rawBuyVals = Object.values(buyData).map(x => x.val).sort((a,b) => b - a);
+            let rawSellVals = Object.values(sellData).map(x => x.val).sort((a,b) => b - a);
+            let rawBuyLots = Object.values(buyData).reduce((acc, x) => acc + x.lot, 0);
+            let rawSellLots = Object.values(sellData).reduce((acc, x) => acc + x.lot, 0);
+            
+            let totalPastedBuyVal = rawBuyVals.reduce((a, b) => a + b, 0);
+            let totalPastedSellVal = rawSellVals.reduce((a, b) => a + b, 0);
+            let grandTotalPastedVal = totalPastedBuyVal + totalPastedSellVal;
+            
+            let allBuyPct = grandTotalPastedVal > 0 ? ((totalPastedBuyVal / grandTotalPastedVal) * 100) : 50;
+            let allSellPct = grandTotalPastedVal > 0 ? ((totalPastedSellVal / grandTotalPastedVal) * 100) : 50;
+            
+            let top3BuyValSum = rawBuyVals.slice(0, 3).reduce((a, b) => a + b, 0);
+            let top3SellValSum = rawSellVals.slice(0, 3).reduce((a, b) => a + b, 0);
+            let grandTotalTop3Val = top3BuyValSum + top3SellValSum;
+            
+            let top3BuyPct = grandTotalTop3Val > 0 ? ((top3BuyValSum / grandTotalTop3Val) * 100) : 50;
+            let top3SellPct = grandTotalTop3Val > 0 ? ((top3SellValSum / grandTotalTop3Val) * 100) : 50;
+            
+            document.getElementById("allTotalVal").textContent = "Total: " + formatBillion(grandTotalPastedVal);
+            document.getElementById("allBuyPct").textContent = "🟢 " + allBuyPct.toFixed(1) + "% Beli";
+            document.getElementById("allSellPct").textContent = "🔴 " + allSellPct.toFixed(1) + "% Jual";
+            document.getElementById("allBuyBar").style.width = allBuyPct + "%";
+            document.getElementById("allBuyVal").textContent = "Buy: " + formatBillion(totalPastedBuyVal) + " (" + rawBuyLots.toLocaleString("id-ID") + " Lot)";
+            document.getElementById("allSellVal").textContent = "Sell: " + formatBillion(totalPastedSellVal) + " (" + rawSellLots.toLocaleString("id-ID") + " Lot)";
+            
+            document.getElementById("top3TotalVal").textContent = "Total Top 3: " + formatBillion(grandTotalTop3Val);
+            document.getElementById("top3BuyPct").textContent = "🟢 " + top3BuyPct.toFixed(1) + "% Beli";
+            document.getElementById("top3SellPct").textContent = "🔴 " + top3SellPct.toFixed(1) + "% Jual";
+            document.getElementById("top3BuyBar").style.width = top3BuyPct + "%";
+            document.getElementById("top3BuyVal").textContent = "Top 3 Buy: " + formatBillion(top3BuyValSum);
+            document.getElementById("top3SellVal").textContent = "Top 3 Sell: " + formatBillion(top3SellValSum);
+            
+            const allBrokers = new Set([...Object.keys(buyData), ...Object.keys(sellData)]);
+            
+            let netVolSum = 0;
+            let netCashSum = 0;
+            let institutionalScore = 0;
+            
+            let totalBuyLot = 0; let totalSellLot = 0;
+            let buyLotsArray = []; let sellLotsArray = [];
+            
+            let results = [];
+            allBrokers.forEach(broker => {
+                const b = buyData[broker] || { val: 0, lot: 0, freq: 0, avgTradePrice: 0 };
+                const s = sellData[broker] || { val: 0, lot: 0, freq: 0, avgTradePrice: 0 };
+                const netLot = b.lot - s.lot;
+                const exactNetCash = b.val - s.val;
+                
+                if (netLot === 0) return;
+                
+                if(netLot > 0) { totalBuyLot += netLot; buyLotsArray.push({lot: netLot, broker: broker}); }
+                else { totalSellLot += Math.abs(netLot); sellLotsArray.push({lot: Math.abs(netLot), broker: broker}); }
+                
+                netVolSum += netLot;
+                netCashSum += exactNetCash;
+                
+                let avgValue = 0;
+                let brokerAvgPrice = 0;
+                let actionText = "";
+                let actionClass = "";
+                let isBuyer = false;
+                if (netLot > 0) {
+                    isBuyer = true;
+                    actionText = "NET BUYER";
+                    actionClass = "action-buyer";
+                    if (b.freq > 0) avgValue = b.val / b.freq;
+                    brokerAvgPrice = b.avgTradePrice;
+                } else {
+                    isBuyer = false;
+                    actionText = "NET SELLER";
+                    actionClass = "action-seller";
+                    if (s.freq > 0) avgValue = s.val / s.freq;
+                    brokerAvgPrice = s.avgTradePrice;
+                }
+                
+                const lotPerDay = Math.round(Math.abs(netLot) / tradeDays);
+                let statusHtml = "";
+                let floatHtml = "";
+                const brokerData = getBrokerInfo(broker);
+                
+                let isFakeRetail = (brokerData.isRetail && avgValue > thresholdValue);
+                if (isFakeRetail) brokerData.isWhale = true;
+                
+                if(currentPrice > 0 && brokerAvgPrice > 0 && brokerData.isWhale) {
+                    if(isBuyer) {
+                        if(brokerAvgPrice > currentPrice) floatHtml = '<span class="float-badge float-loss">nyangkut (loss)</span>';
+                        else floatHtml = '<span class="float-badge float-cuan">sedang profit</span>';
+                    }
+                }
+                
+                if (brokerData.isRetail && !isFakeRetail) {
+                    let score = 1;
+                    institutionalScore += isBuyer ? -score : score;
+                    statusHtml = isBuyer ? '<span class="badge retail">🟢 RITEL ASLI (BELI)</span>' : '<span class="badge retail" style="background:transparent; border-color:var(--danger); color:var(--danger);">🔴 RITEL ASLI (JUAL)</span>';
+                } else {
+                    let score = 2;
+                    if (avgValue > whaleThreshold) score = 4;
+                    else if (avgValue > thresholdValue) score = 3;
+                    
+                    institutionalScore += isBuyer ? score : -score;
+                    
+                    if (isFakeRetail) {
+                        statusHtml = isBuyer ? '<span class="badge fake">🚨 FAKE RETAIL (BANDAR AKUMULASI)</span>' : '<span class="badge fake">🚨 FAKE RETAIL (BANDAR DISTRIBUSI)</span>';
+                    } else if (brokerData.type === "Institusi Asing") {
+                        if (avgValue > whaleThreshold) statusHtml = isBuyer ? '<span class="badge asing">🐳 WHALE ASING (HAKA MASIF)</span>' : '<span class="badge asing" style="background:var(--danger);">💥 WHALE ASING (BUANG BARANG)</span>';
+                        else if (avgValue > thresholdValue) statusHtml = isBuyer ? '<span class="badge asing">🌐 ASING (AKUMULASI)</span>' : '<span class="badge asing" style="background:transparent; border-color:var(--danger); color:var(--danger);">🔴 ASING (DISTRIBUSI)</span>';
+                        else statusHtml = isBuyer ? '<span class="badge asing" style="opacity: 0.8; background: transparent; border-color: rgba(192, 132, 252, 0.3);">🤖 ASING (NYICIL BELI)</span>' : '<span class="badge asing" style="opacity: 0.8; border-color: var(--danger); color:var(--danger); background: transparent;">🤖 ASING (NYICIL JUAL)</span>';
+                    } else if (brokerData.type === "Institusi Lokal") {
+                        if (avgValue > whaleThreshold) statusHtml = isBuyer ? '<span class="badge insti">🏢 BIG LOKAL (HAKA MASIF)</span>' : '<span class="badge insti" style="background:var(--danger); color:white;">🏢 BIG LOKAL (BUANG BARANG)</span>';
+                        else if (avgValue > thresholdValue) statusHtml = isBuyer ? '<span class="badge insti">🏢 LOKAL (AKUMULASI)</span>' : '<span class="badge insti" style="background:transparent; border-color:var(--danger); color:var(--danger);">🏢 LOKAL (DISTRIBUSI)</span>';
+                        else statusHtml = isBuyer ? '<span class="badge insti" style="opacity: 0.8; background: transparent;">🛡️ LOKAL (NYICIL BELI)</span>' : '<span class="badge insti" style="opacity: 0.8; border-color:var(--danger); color:var(--danger); background: transparent;">🛡️ LOKAL (NYICIL JUAL)</span>';
+                    } else if (brokerData.type === "Market Maker") {
+                        if (avgValue > whaleThreshold) statusHtml = isBuyer ? '<span class="badge fake">🚨 MARKET MAKER (HAKA)</span>' : '<span class="badge fake">💥 MARKET MAKER (HAKI / GUYUR)</span>';
+                        else statusHtml = isBuyer ? '<span class="badge fake" style="opacity: 0.8; background: transparent;">⚠️ MM (AKUMULASI)</span>' : '<span class="badge fake" style="opacity: 0.8; border-color:var(--danger); color:var(--danger); background: transparent;">⚠️ MM (DISTRIBUSI)</span>';
+                    } else {
+                        statusHtml = isBuyer ? '<span class="badge unknown">⚪ PARTISIPAN BESAR (BELI)</span>' : '<span class="badge unknown">⚪ PARTISIPAN BESAR (JUAL)</span>';
+                    }
+                }
+                
+                const fullName = brokerNames[broker] ? brokerNames[broker] : "Broker Tidak Dikenal";
+                const actionWord = isBuyer ? "belinya" : "jualnya";
+                
+                let narrative = '<span class="narrative-text">' + broker + ' rata-rata ' + actionWord + ' Rp ' + formatBillion(avgValue) + ' per klik.';
+                if (brokerAvgPrice > 0) {
+                    narrative += ' Harga modal rata-rata di ' + formatRupiah(brokerAvgPrice) + ' / saham.';
+                }
+                narrative += '</span>';
+                
+                results.push({ broker, fullName, brokerData, netLot, exactNetCash, avgValue, statusHtml, isBuyer, actionClass, actionText, narrative, lotPerDay, brokerAvgPrice, floatHtml });
+            });
+            
+            buyLotsArray.sort((a,b)=>b.lot-a.lot);
+            sellLotsArray.sort((a,b)=>b.lot-a.lot);
+            
+            const top3Buy = buyLotsArray.slice(0,3).reduce((a,b)=>a+b.lot, 0);
+            const top3Sell = sellLotsArray.slice(0,3).reduce((a,b)=>a+b.lot, 0);
+            const monoBuyRatio = totalBuyLot > 0 ? ((top3Buy / totalBuyLot) * 100).toFixed(1) : 0;
+            const monoSellRatio = totalSellLot > 0 ? ((top3Sell / totalSellLot) * 100).toFixed(1) : 0;
+            
+            let hhiBuy = 0;
+            if(totalBuyLot > 0) {
+                hhiBuy = buyLotsArray.reduce((sum, item) => sum + Math.pow((item.lot/totalBuyLot)*100, 2), 0);
+            }
+            
+            if (tradeDays > 1) {
+                if (hhiBuy >= 2500) institutionalScore += 4;
+                else if (hhiBuy >= 1500) institutionalScore += 2;
+            }
+            
+            results.sort((a, b) => b.netLot - a.netLot);
+            
+            let driverStatus = "Tidak Ada Dominasi Mutlak";
+            let crossingWarning = false;
+            let isAbsorption = false;
+            let isStealth = false;
+            
+            const topBuyer = results.find(r => r.isBuyer);
+            const topSeller = results.slice().reverse().find(r => !r.isBuyer);
+            
+            if(topBuyer && topBuyer.brokerData.isWhale && (topBuyer.netLot / totalBuyLot) >= 0.3) {
+                driverStatus = "Sopir Utama: " + topBuyer.broker + " (" + ((topBuyer.netLot/totalBuyLot)*100).toFixed(0) + "% Daya Beli)";
+            }
+            
+            if(topBuyer && topSeller && topBuyer.brokerData.isWhale && topSeller.brokerData.isWhale) {
+                const ratio = Math.abs(topBuyer.netLot) / Math.abs(topSeller.netLot);
+                if(ratio >= 0.8 && ratio <= 1.25 && Math.abs(topBuyer.netLot) > (totalBuyLot*0.15)) {
+                    crossingWarning = true;
+                }
+            }
+            
+            if(topBuyer && topSeller && !topSeller.brokerData.isWhale && topBuyer.brokerData.isWhale) {
+                if(priceChange <= 0 && topBuyer.netLot >= (totalBuyLot * 0.2)) {
+                    isAbsorption = true;
+                }
+            }
+            
+            if(!isAbsorption && topBuyer && topBuyer.brokerData.isWhale && institutionalScore >= 4 && priceChange <= 1) {
+                if(tradeDays > 1 && hhiBuy > 1500) {
+                    isStealth = true;
+                }
+            }
+            
+            results.forEach(res => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="font-weight: bold; color: var(--primary); font-size: 1.1rem;">
+                        ${res.broker}<br>
+                        <span class="broker-fullname">${res.fullName}</span>
+                        <span class="broker-tag ${res.brokerData.class}">${res.brokerData.type}</span>
+                    </td>
+                    <td class="${res.actionClass}">${res.actionText}</td>
+                    <td style="font-weight:bold; font-size:1.1rem;">${res.netLot > 0 ? "+"+res.netLot.toLocaleString("id-ID") : res.netLot.toLocaleString("id-ID")}</td>
+                    <td style="color:${res.exactNetCash > 0 ? "var(--success)" : "var(--danger)"}; font-weight:bold;">${res.exactNetCash > 0 ? "+" : ""}${formatBillion(res.exactNetCash)}</td>
+                    <td class="val-highlight">${formatRupiah(res.avgValue)}</td>
+                    <td>${res.statusHtml} ${res.floatHtml} ${res.narrative}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            let stratTitle = "";
+            let stratDesc = "";
+            if (tradeDays <= 1) {
+                stratTitle = "⚡ CORE 1: INTRADAY ENGINE (Momentum Agresif)";
+                stratDesc = "Anda menarik data 1 Hari untuk " + tickerLabel + ". Mesin fokus mutlak pada Agresivitas (Rp/Klik) untuk mencari ledakan harga mendadak hari ini.";
+            } else {
+                stratTitle = "🏔️ CORE 2: SWING ENGINE (Konsistensi & Monopoli)";
+                stratDesc = "Anda menarik data " + tradeDays + " Hari untuk " + tickerLabel + ". Mesin mengaktifkan HHI Index untuk mendeteksi Sopir Tunggal dan toleransi Average diturunkan untuk mendeteksi Iceberg Order.";
+            }
+            document.getElementById("strategyTitle").textContent = stratTitle;
+            document.getElementById("strategyDesc").textContent = stratDesc;
+
+            let execAction = "🟡 HOLD / WAIT";
+            let execTitle = "Netral / Menunggu Konfirmasi";
+            let execDesc = "Tidak ada aktivitas bandar/uang besar yang dominan secara arah pada " + tickerLabel + ". Pergerakan didorong ritel atau belum ada niat menaikkan harga.";
+            let execColor = "var(--warning)";
+            let execBg = "var(--warning-bg)";
+            
+            if(crossingWarning) {
+                execAction = "🤝 HOLD / PANTAU";
+                execTitle = "TUKAR BARANG (CROSSING / ESTAFET)";
+                execDesc = "Bandar " + topSeller.broker + " memindahkan barang besar ke Bandar " + topBuyer.broker + ". Bukan distribusi murni, tapi perpindahan sopir. Tunggu arah pergerakan sopir baru!";
+                execColor = "var(--info)";
+                execBg = "var(--info-bg)";
+            } else if (isAbsorption) {
+                execAction = "🧲 BELI (ABSORPTION / LIQUIDITY TRAP)";
+                execTitle = "BANDAR MENADAH KEPANIKAN RITEL";
+                execDesc = "Harga tertekan turun dan ritel membuang barang, TETAPI Bandar memasang tembok dan menyerap semua buangan tersebut. Probabilitas teknikal rebound sangat tinggi.";
+                execColor = "var(--success)";
+                execBg = "var(--success-bg)";
+            } else if (isStealth) {
+                execAction = "🥷 BELI (STEALTH ACCUMULATION)";
+                execTitle = "AKUMULASI SENYAP (DIVERGENSI HARGA)";
+                execDesc = "Monopoli Bandar sangat kuat dan Net Cash masuk masif, tetapi harga saham ditahan stagnan/turun. Bandar sedang menyembunyikan jejak. Entry sekarang sebelum fase Mark-Up!";
+                execColor = "var(--success)";
+                execBg = "var(--success-bg)";
+            } else if (institutionalScore >= 5) {
+                let superBuy = (topBuyer && topBuyer.floatHtml.includes("nyangkut")) ? "SUPER " : "";
+                execAction = "🟢 " + superBuy + "BELI (ENTRY NOW)";
+                execTitle = "BANDAR AKUMULASI MASIF";
+                execDesc = "Dominasi Institusi/Asing sangat kuat memborong " + tickerLabel + ", sementara ritel membuang barang. Ini sinyal ENTRY terbaik. (Paus nyangkut = Bonus Probabilitas Tarikan).";
+                execColor = "var(--success)";
+                execBg = "var(--success-bg)";
+            } else if (institutionalScore <= -5) {
+                execAction = "🔴 JANGAN BELI / JUAL (EXIT)";
+                execTitle = "BANDAR BUANG BARANG (DISTRIBUSI)";
+                execDesc = "Uang besar terdeteksi keluar secara masif (HAKI) dari " + tickerLabel + ", sementara Ritel justru sedang FOMO menampung barang di pucuk. Jika Anda punya barang, AMANKAN PROFIT SEKARANG!";
+                execColor = "var(--danger)";
+                execBg = "var(--danger-bg)";
+            } else if (institutionalScore >= 2 && institutionalScore < 5) {
+                execAction = "🟡 CICIL BELI / HOLD";
+                execTitle = "FASE AKUMULASI RINGAN";
+                execDesc = "Terdeteksi adanya uang besar yang mulai masuk mencicil di " + tickerLabel + ". Masih dalam fase base building, layak dipantau atau cicil beli bertahap di dasar.";
+            } else if (institutionalScore <= -2 && institutionalScore > -5) {
+                execAction = "🟠 PASANG TRAILING STOP (RAWAN)";
+                execTitle = "DISTRIBUSI BERTAHAP";
+                execDesc = "Institusi / Uang Besar terpantau mulai jualan pelan-pelan di " + tickerLabel + ". Waspada terhadap koreksi penurunan harga dalam waktu dekat.";
+            }
+            
+            document.getElementById("signalAction").textContent = execAction;
+            document.getElementById("signalAction").style.color = execColor;
+            document.getElementById("signalTitle").textContent = execTitle;
+            document.getElementById("signalDesc").textContent = execDesc;
+            document.getElementById("signalScore").textContent = "Skor Dominasi Bandar: " + (institutionalScore > 0 ? "+"+institutionalScore : institutionalScore);
+            document.getElementById("driverStatus").textContent = "Pengendali: " + driverStatus;
+            document.getElementById("signalBox").style.backgroundColor = execBg;
+            document.getElementById("signalBox").style.borderColor = execColor;
+            
+            document.getElementById("statNetCash").textContent = (netCashSum > 0 ? "+" : "") + formatBillion(netCashSum);
+            document.getElementById("statNetCash").style.color = netCashSum > 0 ? "var(--success)" : "var(--danger)";
+            
+            document.getElementById("statHHI").textContent = Math.round(hhiBuy).toLocaleString("id-ID");
+            document.getElementById("statHHI").style.color = hhiBuy > 1500 ? "var(--foreign)" : "var(--text-muted)";
+            
+            document.getElementById("statMonoBuy").textContent = monoBuyRatio + "%";
+            document.getElementById("statMonoSell").textContent = monoSellRatio + "%";
+            
+            const avgPace = Math.round(Math.abs(netVolSum) / tradeDays);
+            document.getElementById("statPace").textContent = avgPace.toLocaleString("id-ID") + " Lot/Hari";
+            
+            const rdnCapital = parseFloat(document.getElementById("rdnCapital")?.value) || 10000000;
+            const quantPlan = computeQuantPlan({
+                results,
+                currentPrice,
+                institutionalScore,
+                hhiBuy,
+                isAbsorption,
+                isStealth,
+                crossingWarning,
+                rdnCapital
+            });
+            renderQuantCards(quantPlan, rdnCapital);
+
+            document.getElementById("resultCard").style.display = "block";
+            
+            
+            // Populate Online Market Context Grid
+            const cachedMeta = priceCache[tickerInput] || null;
+            const mcRangeEl = document.getElementById("mcDayRange");
+            const mcVolEl = document.getElementById("mcMarketVol");
+            const mcTurnEl = document.getElementById("mcMarketTurnover");
+            const mcShareEl = document.getElementById("mcBandarShare");
+
+            if (cachedMeta && cachedMeta.marketVolLots > 0) {
+                const estTurnover = cachedMeta.marketVolLots * 100 * currentPrice;
+                const bandarDominancePct = estTurnover > 0 ? Math.min(100, ((top3BuyValSum + top3SellValSum) / (estTurnover * 2)) * 100) : 0;
+                mcRangeEl.textContent = `Rp ${Math.round(cachedMeta.dayLow).toLocaleString("id-ID")} - ${Math.round(cachedMeta.dayHigh).toLocaleString("id-ID")}`;
+                mcVolEl.textContent = `${cachedMeta.marketVolLots.toLocaleString("id-ID")} Lot`;
+                mcTurnEl.textContent = formatBillion(estTurnover);
+                mcShareEl.textContent = `${bandarDominancePct.toFixed(1)}% Top 3`;
+            } else {
+                mcRangeEl.textContent = formatRupiah(currentPrice);
+                mcVolEl.textContent = `${Math.max(rawBuyLots, rawSellLots).toLocaleString("id-ID")} Lot (Broksum)`;
+                mcTurnEl.textContent = formatBillion(grandTotalPastedVal / 2);
+                mcShareEl.textContent = "Data Live Vol N/A";
+            }
+
+            window.lastScanRecord = {
+                timestamp: new Date().toLocaleString("id-ID"),
+                ticker: tickerLabel,
+                company: companyName,
+                price: currentPrice,
+                changePct: priceChange,
+                days: tradeDays,
+                signal: execAction,
+                title: execTitle,
+                score: institutionalScore,
+                netCash: netCashSum,
+                hhi: Math.round(hhiBuy),
+                topBuyer: topBuyer ? topBuyer.broker : "-",
+                topSeller: topSeller ? topSeller.broker : "-"
+            };
+
+            exportDataString = "--- WHALEX-RAY V36.0 ONLINE EXPORT ---\nEmiten: " + tickerLabel + " (" + companyName + ")\nHarga: Rp " + currentPrice + " (" + (priceChange >= 0 ? "+" : "") + priceChange + "%)\nPeriode: " + tradeDays + " Hari\nMode Strategi: " + stratTitle + "\n\nSinyal: " + execAction + "\n" + execTitle + "\n\nTotal Transaksi Di-Paste: " + formatBillion(grandTotalPastedVal) + " (Beli: " + allBuyPct.toFixed(1) + "% vs Jual: " + allSellPct.toFixed(1) + "%)\nHead-to-Head Top 3: Beli " + top3BuyPct.toFixed(1) + "% vs Jual " + top3SellPct.toFixed(1) + "%\n\nSkor Bandar: " + institutionalScore + "\nHHI Index: " + Math.round(hhiBuy) + "\nNet Cash: " + (netCashSum > 0 ? "+" : "") + formatBillion(netCashSum) + "\n" + driverStatus + "\n\nTop Buyer: " + (topBuyer?topBuyer.broker:"") + " (" + (topBuyer?formatBillion(topBuyer.exactNetCash):"") + ")\nTop Seller: " + (topSeller?topSeller.broker:"") + " (" + (topSeller?formatBillion(topSeller.exactNetCash):"") + ")";
+            
+        } catch (error) {
+            alert("⚠️ Terjadi kesalahan saat memproses data. Detail Error: " + error.message);
+            console.error(error);
+        }
+    }
+    
+    function exportJournal() {
+        navigator.clipboard.writeText(exportDataString).then(() => {
+            alert("✅ Berhasil disalin ke Clipboard! Tinggal Paste (Ctrl+V) di Google Sheets Trading Journal Anda.");
+        }).catch(err => {
+            alert("Gagal menyalin: ", err);
+        });
+    }
+    
+    // === CHROME EXTENSION & URL BRIDGE ===
+    window.addEventListener("message", function(event) {
+        if (event.data && event.data.type === "WHALEXRAY_BATCH_PAYLOAD") {
+            ingestBatchPayload(event.data.payload);
+            return;
+        }
+        if (event.data && event.data.type === "WHALEXRAY_BROKSUM_PAYLOAD") {
+            const p = event.data.payload;
+            if (p.ticker) {
+                const tickerEl = document.getElementById("stockTicker");
+                tickerEl.value = p.ticker.toUpperCase();
+                onTickerInput();
+            }
+            if (p.buyText) document.getElementById("buyInput").value = p.buyText;
+            if (p.sellText) document.getElementById("sellInput").value = p.sellText;
+            if (p.days) document.getElementById("tradeDays").value = p.days;
+            smartExtractFromPaste();
+            if (p.autoScan) {
+                setTimeout(() => scanData(), 250);
+            }
+        }
+    });
+
+    function checkUrlBridge() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+            const batchDataRaw = params.get("batchdata") || hashParams.get("batchdata");
+            if (batchDataRaw) {
+                try {
+                    const parsedBatch = JSON.parse(batchDataRaw);
+                    if (Array.isArray(parsedBatch) && parsedBatch.length > 0) {
+                        setTimeout(() => ingestBatchPayload(parsedBatch), 150);
+                        return;
+                    }
+                } catch (errBatch) {
+                    console.error("Batch hash parse error:", errBatch);
+                }
+            }
+            const ticker = params.get("ticker") || hashParams.get("ticker");
+            const buy = params.get("buy") || hashParams.get("buy");
+            const sell = params.get("sell") || hashParams.get("sell");
+            const days = params.get("days") || hashParams.get("days");
+            const auto = params.get("auto") || hashParams.get("auto");
+
+            const extPrice = params.get("price") || hashParams.get("price");
+            const extChg = params.get("chg") || hashParams.get("chg");
+            if (ticker) {
+                document.getElementById("stockTicker").value = ticker.toUpperCase();
+                onTickerInput();
+            }
+            if (extPrice && parseFloat(extPrice) > 0) {
+                const pVal = Math.round(parseFloat(extPrice));
+                const cVal = extChg ? parseFloat(extChg) : 0;
+                applyFetchedPrice(ticker ? ticker.toUpperCase() : "IDX", pVal, cVal !== 0 ? (pVal / (1 + cVal/100)) : pVal, "Stockbit Live");
+            }
+            if (days) document.getElementById("tradeDays").value = days;
+            if (buy) document.getElementById("buyInput").value = decodeURIComponent(buy);
+            if (sell) document.getElementById("sellInput").value = decodeURIComponent(sell);
+            if (buy || sell) {
+                smartExtractFromPaste();
+                if (auto === "1") setTimeout(() => scanData(), 300);
+            }
+        } catch (e) { console.error("Bridge parse error:", e); }
+    }
+
+    
+    // === V36.0 ONLINE UNLIMITED FEATURES ===
+    let autoRefreshTimer = null;
+    function toggleAutoRefresh() {
+        const btn = document.getElementById("btnAutoRefresh");
+        if (autoRefreshTimer) {
+            clearInterval(autoRefreshTimer);
+            autoRefreshTimer = null;
+            btn.textContent = "⏱️ Live Auto-Refresh (30d): OFF";
+            btn.classList.remove("active");
+        } else {
+            const ticker = document.getElementById("stockTicker").value.trim().toUpperCase();
+            if (ticker.length !== 4) {
+                alert("Masukkan 4 huruf kode saham terlebih dahulu untuk mengaktifkan Auto-Refresh.");
+                return;
+            }
+            btn.textContent = "⏱️ Live Auto-Refresh (30d): ON";
+            btn.classList.add("active");
+            manualRetryPrice();
+            autoRefreshTimer = setInterval(() => {
+                const curTicker = document.getElementById("stockTicker").value.trim().toUpperCase();
+                if (curTicker.length === 4) {
+                    delete priceCache[curTicker];
+                    fetchLiveStockPrice(curTicker);
+                }
+            }, 30000);
+        }
+    }
+
+    function openQuickChart() {
+        const ticker = document.getElementById("stockTicker").value.trim().toUpperCase() || "IHSG";
+        const symbol = ticker === "IHSG" ? "IDX:COMPOSITE" : `IDX:${ticker}`;
+        window.open(`https://www.tradingview.com/chart/?symbol=${encodeURIComponent(symbol)}`, "_blank");
+    }
+
+    // Paste Image Anywhere for OCR
+    document.addEventListener("paste", function(e) {
+        const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+        if (!items) return;
+        for (let item of items) {
+            if (item.type.indexOf("image") === 0) {
+                const file = item.getAsFile();
+                if (file) handleOcrFile(file);
+                break;
+            }
+        }
+    });
+
+    async function handleOcrFile(file) {
+        if (!file) return;
+        const statusEl = document.getElementById("ocrStatus");
+        if (typeof Tesseract === "undefined") {
+            statusEl.textContent = "⚠️ Library OCR sedang memuat, coba beberapa detik lagi.";
+            return;
+        }
+        statusEl.textContent = "⏳ Membaca teks broksum dari gambar screenshot (OCR)...";
+        try {
+            const { data: { text } } = await Tesseract.recognize(file, "eng");
+            parseOcrBroksumText(text);
+            statusEl.textContent = "✅ Screenshot berhasil diekstrak! Periksa kolom Buy/Sell di bawah lalu klik Eksekusi.";
+        } catch (err) {
+            console.error(err);
+            statusEl.textContent = "❌ Gagal membaca gambar: " + err.message;
+        }
+    }
+
+    function parseOcrBroksumText(rawText) {
+        const validBrokers = new Set(Object.keys(brokerNames));
+        const lines = rawText.split(/\r?\n/);
+        let buyLines = [];
+        let sellLines = [];
+
+        lines.forEach(line => {
+            const tokens = line.trim().toUpperCase().split(/\s+/);
+            // Find broker codes in line (either 1 side or side-by-side BY and SL)
+            let brokerIndices = [];
+            tokens.forEach((tok, idx) => {
+                const clean = tok.replace(/[^A-Z]/g, "");
+                if (clean.length === 2 && validBrokers.has(clean)) {
+                    brokerIndices.push({ code: clean, idx });
+                }
+            });
+            if (brokerIndices.length >= 2) {
+                // Side by side: first is buyer, second is seller
+                const bPart = [brokerIndices[0].code, ...tokens.slice(brokerIndices[0].idx + 1, brokerIndices[1].idx)].join("\t");
+                const sPart = [brokerIndices[1].code, ...tokens.slice(brokerIndices[1].idx + 1)].join("\t");
+                buyLines.push(bPart);
+                sellLines.push(sPart);
+            } else if (brokerIndices.length === 1) {
+                const row = [brokerIndices[0].code, ...tokens.slice(brokerIndices[0].idx + 1)].join("\t");
+                buyLines.push(row);
+            }
+        });
+
+        if (buyLines.length > 0) document.getElementById("buyInput").value = buyLines.join("\n");
+        if (sellLines.length > 0) document.getElementById("sellInput").value = sellLines.join("\n");
+        smartExtractFromPaste();
+    }
+
+    // Cloud & LocalStorage Trading Journal
+    function saveWebhookUrl() {
+        const url = document.getElementById("gsheetWebhook").value.trim();
+        localStorage.setItem("whalexray_gsheet_webhook", url);
+    }
+
+    function renderJournalHistory() {
+        const listEl = document.getElementById("journalHistoryList");
+        const webhookEl = document.getElementById("gsheetWebhook");
+        if (webhookEl) webhookEl.value = localStorage.getItem("whalexray_gsheet_webhook") || "";
+        if (!listEl) return;
+
+        const history = JSON.parse(localStorage.getItem("whalexray_journal_v36") || "[]");
+        if (history.length === 0) {
+            listEl.innerHTML = "<i>Belum ada riwayat analisis tersimpan. Klik tombol 'Simpan ke Jurnal Online' setelah analisis.</i>";
+            return;
+        }
+        listEl.innerHTML = history.slice().reverse().map(item => `
+            <div style="padding:6px 8px; border-bottom:1px solid #1e293b; display:flex; justify-content:space-between; gap:8px;">
+                <span><strong style="color:var(--info);">${item.ticker}</strong> (${item.timestamp}) — <b>${item.signal}</b></span>
+                <span style="font-family:monospace; color:${item.netCash >= 0 ? 'var(--success)' : 'var(--danger)'};">${item.netCash >= 0 ? '+' : ''}${formatBillion(item.netCash)} | Skor: ${item.score}</span>
+            </div>
+        `).join("");
+    }
+
+    async function saveToCloudJournal() {
+        if (!window.lastScanRecord) {
+            alert("Jalankan analisis terlebih dahulu sebelum menyimpan ke jurnal.");
+            return;
+        }
+        const history = JSON.parse(localStorage.getItem("whalexray_journal_v36") || "[]");
+        history.push(window.lastScanRecord);
+        localStorage.setItem("whalexray_journal_v36", JSON.stringify(history));
+        renderJournalHistory();
+
+        const webhookUrl = (document.getElementById("gsheetWebhook")?.value || "").trim();
+        if (webhookUrl && webhookUrl.startsWith("http")) {
+            try {
+                await fetch(webhookUrl, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(window.lastScanRecord)
+                });
+                alert("✅ Tersimpan di riwayat browser & terkirim ke Google Sheets Webhook Anda!");
+            } catch (e) {
+                alert("✅ Tersimpan di browser, namun gagal mengirim ke Webhook: " + e.message);
+            }
+        } else {
+            alert("✅ Tersimpan permanen di Jurnal Online browser Anda! (Isi URL Google Apps Script jika ingin auto-sync ke Google Sheets).");
+        }
+    }
+
+    function exportAllJournalCsv() {
+        const history = JSON.parse(localStorage.getItem("whalexray_journal_v36") || "[]");
+        if (history.length === 0) { alert("Riwayat jurnal masih kosong."); return; }
+        const headers = ["Timestamp","Ticker","Company","Price","ChangePct","Days","Signal","Title","Score","NetCash","HHI","TopBuyer","TopSeller"];
+        const rows = history.map(r => headers.map(h => `"${String(r[h.charAt(0).toLowerCase() + h.slice(1)] ?? r[h] ?? "").replace(/"/g, '""')}"`).join(","));
+        const csv = [headers.join(","), ...rows].join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `WhaleXRay_Journal_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+    }
+
+    function clearJournalHistory() {
+        if (confirm("Hapus seluruh riwayat jurnal tersimpan di browser ini?")) {
+            localStorage.removeItem("whalexray_journal_v36");
+            renderJournalHistory();
+        }
+    }
+
+    window.onload = function() {
+        loadSavedRdnCapital();
+        autoUpdateThreshold();
+        checkUrlBridge();
+        renderJournalHistory();
+        // Poll briefly for injected batch payload from Chrome Extension
+        let batchChecks = 0;
+        const batchPoll = setInterval(() => {
+            batchChecks++;
+            if (Array.isArray(window.__WHALEXRAY_BATCH__) && window.__WHALEXRAY_BATCH__.length > 0) {
+                const data = window.__WHALEXRAY_BATCH__;
+                window.__WHALEXRAY_BATCH__ = null;
+                clearInterval(batchPoll);
+                ingestBatchPayload(data);
+            } else if (batchChecks >= 25) {
+                clearInterval(batchPoll);
+            }
+        }, 200);
+    };
+</script>
+</body>
+</html>
